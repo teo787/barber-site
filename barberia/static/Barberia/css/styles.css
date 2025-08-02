@@ -1,0 +1,24 @@
+.hero-box {
+  
+    border: 2px solid #000000;      /* Borde rojo como en la imagen */
+  border-radius: 15px;            /* Bordes redondeados */
+  padding: 20px;                  /* Espaciado interno */
+  text-align: center;             /* Centra el contenido */
+  width: fit-content;             /* Ajusta el tamaño al contenido */
+  margin: 40px auto;              /* Centra el cuadro horizontalmente */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Sombra ligera */
+  background-color: #f3f3f3;         /* Fondo blanco */
+}
+
+.logo-img {
+  width: 200px;     /* Ajusta según lo que necesites */
+  height: auto;
+  display: block;
+  margin: 0 auto 20px auto; /* Centrado + margen abajo */
+}
+
+.Logo-header {
+  width: 120px;
+  height: auto;
+  margin-right: 10px;
+}

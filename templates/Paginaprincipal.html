@@ -1,22 +1,17 @@
-{% extends "base.html" %}
-
+{% extends "Base.html" %}
+{% load static %}
 {% block title %}Inicio | Explicit Barber{% endblock %}
-
 {% block content %}
-    <div class="seccion">
-        <h2>Servicios</h2>
-        <div class="servicios">
-            <div class="caja">Corte de Cabello</div>
-            <div class="caja">Barba</div>
-            <div class="caja">Perfilación de Cejas</div>
-        </div>
-    </div>
-
-    <div class="seccion">
-        <h2>Barbers</h2>
-        <div class="barbers">
-            <div class="caja">Sede 1</div>
-            <div class="caja">Sede 2</div>
-        </div>
-    </div>
+<section class="hero-box">
+    <img src="{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="logo-img">
+    <h1>BIENVENIDO A EXPLICIT BARBER</h1>
+    <p>DONDE TENEMOS EL MEJOR SERVICIO</p>
+    <button class="cta-button">RESERVA EN LÍNEA</button>
+  </section>
+<div class="map-container">
+    <div style="text-align: center; margin: 20px 0;">           
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1667.1366250249293!2d-75.44446713552102!3d6.375731341037127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e443b4f3c71a605%3A0xff1f6f2b77baee18!2sExplicit%20Barber%20Shop!5e0!3m2!1ses-419!2sco!4v1754003570957!5m2!1ses-419!2sco" 
+                    width="600" height="450" style="border:0;"allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
 {% endblock %}

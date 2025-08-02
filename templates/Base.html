@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Explicit Barber</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>{% block title %}Explicit Barber{% endblock%}</title>
+  <link rel="stylesheet" href="{% static 'Barberia/css/styles.css' %}">
   <style>
     body {
       margin: 0;
@@ -79,7 +80,8 @@
 </head>
 <body>
   <header>
-    <img src="logo.png" class="logo" alt="Logo Explicit">
+    <img src= "{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="Logo-header">
+    
     <nav>
       <a href="#">INICIO</a>
       <a href="#">MEMBRESIA</a>
@@ -87,19 +89,10 @@
       <a href="#">CONTACTO</a>
       <a href= "#">BARBERS</a>
     </nav>
-  </header>
-
-  <section class="hero">
-    <img src="explicit-logo.png" alt="Explicit Logo">
-    <h1>BIENVENIDO A EXPLICIT BARBER</h1>
-    <p>DONDE TENEMOS EL MEJOR SERVICIO</p>
-    <button class="cta-button">RESERVA EN LÍNEA</button>
-  </section>
-<div class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1667.1366250249293!2d-75.44446713552102!3d6.375731341037127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e443b4f3c71a605%3A0xff1f6f2b77baee18!2sExplicit%20Barber%20Shop!5e0!3m2!1ses-419!2sco!4v1754003570957!5m2!1ses-419!2sco" 
-                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
- <footer>
+    </header>
+  
+{% block content %}{% endblock%}
+  <footer>
     <p>Todos los derechos reservados EXPLICIT BARBER &copy; 2025</p>
   </footer>
 </body>
