@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+ 
   <meta charset="UTF-8">
   <title>{% block title %}Explicit Barber{% endblock%}</title>
   <link rel="stylesheet" href="{% static 'Barberia/css/styles.css' %}">
@@ -12,7 +13,7 @@
       background-color: #fff;
     }
     header {
-      background-color: #000;
+      background-color: #061e2eff;
       padding: 1em;
       display: flex;
       align-items: center;
@@ -45,12 +46,16 @@
       opacity: 0.8;
     }
     .cta-button {
-      background-color: #000;
+      background-color: #061e2eff;
       color: white;
       padding: 0.8em 1.5em;
-      border: none;
+      border-radius: 15px;
+      border-color: #ffffffff;
       margin-top: 1em;
       cursor: pointer;
+    }
+    .cta-button:hover{
+      background-color: #174b6eff;
     }
     .contact-section {
       text-align: center;
@@ -79,6 +84,7 @@
   </style>
 </head>
 <body>
+  
   <header>
     <img src= "{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="Logo-header">
     
@@ -95,5 +101,6 @@
   <footer>
     <p>Todos los derechos reservados EXPLICIT BARBER &copy; 2025</p>
   </footer>
+<script src="{% static 'Barberia/js/Carrusel.js' %}"></script>
 </body>
 </html>

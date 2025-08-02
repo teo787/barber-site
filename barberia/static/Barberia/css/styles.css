@@ -22,3 +22,46 @@
   height: auto;
   margin-right: 10px;
 }
+
+.carousel {
+  position: relative;
+  width: 900px; /* Ajusta el ancho total del carrusel */
+  height: 900px;
+  margin: 2em auto;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-track  {
+  width: 102%;
+  height: auto ;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  font-size: 2em;
+  padding: 0 10px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.carousel-btn.prev {
+  left: 0;
+}
+.carousel-btn.next {
+  right: 0;
+}
