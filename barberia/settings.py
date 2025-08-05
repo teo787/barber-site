@@ -98,7 +98,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ os.path.join (BASE_DIR / 'barberia/static')]  
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'barberia', 'static', 'Barberia','css')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')    
 
 
