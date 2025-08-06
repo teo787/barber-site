@@ -1,72 +1,96 @@
-.hero-box {
-  
-    border: 2px solid #000000;      /* Borde rojo como en la imagen */
-  border-radius: 15px;            /* Bordes redondeados */
-  padding: 20px;                  /* Espaciado interno */
-  text-align: center;             /* Centra el contenido */
-  width: fit-content;             /* Ajusta el tamaño al contenido */
-  margin: 40px auto;              /* Centra el cuadro horizontalmente */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Sombra ligera */
-  background-color: #f3f3f3;         /* Fondo blanco */
-}
-
-.logo-img {
-  width: 200px;     /* Ajusta según lo que necesites */
-  height: auto;
-  display: block;
-  margin: 0 auto 20px auto; /* Centrado + margen abajo */
-}
-
 .Logo-header {
-  width: 120px;
+  width: 50px;
   height: auto;
   margin-right: 10px;
 }
 
-.carousel {
-  position: relative;
-  width: 900px; /* Ajusta el ancho total del carrusel */
-  height: 900px;
-  margin: 2em auto;
-  overflow: hidden;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+/*
+    Estilos para el contenedor principal
+*/
+.hero-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s ease;
+/*
+    Estilos para el video de fondo
+*/
+.video-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: -2;
 }
 
-.carousel-track img,
-.carousel-track video {
-  width: 500px;
-  height: auto ;
-  object-fit: cover;
-  flex-shrink: 0;
-  margin-right: 10px;
+/*
+    Estilos para la superposición oscura
+*/
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Oscurece el video para que el texto sea legible */
+    z-index: -1;
 }
 
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0,0,0,0.5);
-  border: none;
-  color: white;
-  font-size: 2em;
-  padding: 0 10px;
-  cursor: pointer;
-  z-index: 2;
+/*
+    Estilos para el contenido (texto y botón)
+*/
+.hero-content {
+    z-index: 1;
 }
 
-.carousel-btn.prev {
-  left: 0;
-}
-.carousel-btn.next {
-  right: 0;
+.welcome-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.795);
 }
 
+.welcome-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(26, 25, 25, 0.795);
+}
+
+/*
+    Estilos para el botón de reserva
+*/
+.reserve-button {
+    background-color: #d12709; /* Color naranja del botón */
+    color: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.reserve-button:hover {
+    background-color: #f32d0a; /* Color del botón al pasar el mouse */
+}
+
+.logo {
+    width: 250px; /* Tamaño del logo. Puedes ajustarlo */
+    height: auto;
+    margin-bottom: 0px; /* Espacio debajo del logo */
+}
 .gallery {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 columnas */

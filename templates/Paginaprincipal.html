@@ -2,25 +2,21 @@
 {% load static %}
 {% block title %}Inicio | Explicit Barber{% endblock %}
 {% block content %}
-<section class="hero-box">
-    <img src="{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="logo-img">
-    <h1>BIENVENIDO A EXPLICIT BARBER</h1>
-    <p>MAS QUE UN CORTE, UNA EXPERIENCIA</p>
-    <button class="cta-button">RESERVA EN LÍNEA</button>
-  </section>
-<div class="carousel">
-  <div class="carousel-track">
-    <video controls>
-      <source src="{% static 'Barberia/Videos/Video1.mp4' %}" type="video/mp4">
-      Tu navegador no soporta el elemento de video.
-    </video>  
-    <img src="{% static 'Barberia/Imagenes/slider1.jpeg' %}" alt="Imagen 1">
-    <img src="{% static 'Barberia/Imagenes/slider2.jpeg' %}" alt="Imagen 2">
-    <img src="{% static 'Barberia/Imagenes/slider3.jpeg' %}" alt="Imagen 3">
-  </div>
-  <button class="carousel-btn prev" onclick="moveSlide(-1)">‹</button>
-  <button class="carousel-btn next" onclick="moveSlide(1)">›</button>
-</div>
+<div class="hero-container">
+        <video autoplay muted loop class="video-background">
+            <source src="{% static 'Barberia/Videos/Video1.mp4' %}" type="video/mp4">
+            Tu navegador no soporta el tag de video.
+        </video>
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+          <img src="{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="logo">  
+          <h1 class="welcome-title">BIENVENIDO A EXPLICIT BARBER</h1>
+            <p class="welcome-subtitle">MÁS QUE UN CORTE, UNA EXPERIENCIA</p>
+            <a href="#" class="reserve-button">RESERVA EN LÍNEA</a>
+            
+          </div>
+    </div>
 
 <div class="map-container">
     <div style="text-align: center; margin: 20px 0;">           
