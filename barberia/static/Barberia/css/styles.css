@@ -119,3 +119,149 @@
   font-size: 16px;
   margin-bottom: 10px;
 }
+
+
+
+
+/* Estilos generales para el cuerpo y el contenedor */
+.booking-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    margin: 50px auto; /* Centra el contenedor y le da un margen superior */
+}
+
+/* Ocultar pasos */
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+/* Estilos de los botones */
+.btn {
+    background-color: #fc3021;
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    background-color: #f37c7c;
+}
+
+.btn-back {
+    background-color: #e2e8f0;
+    color: #1a202c;
+    margin-right: 10px;
+}
+
+.btn-back:hover {
+    background-color: #cbd5e0;
+}
+
+/* Estilos para la selección de barberos */
+.barber-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.barber-card {
+    border: 2px solid transparent;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f7fafc;
+    width: 150px;
+}
+
+.barber-card:hover {
+    background-color: #e2e8f0;
+}
+
+.barber-card.selected {
+    border-color: #ff0303;
+    background-color: #fffbeb;
+    box-shadow: 0 0 0 3px #ff1515;
+}
+
+.barber-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.barber-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1a202c;
+}
+
+/* Estilos para la selección de fecha y hora */
+.datetime-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.datetime-picker input[type="date"],
+.datetime-picker input[type="time"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+/* Estilos para el formulario de datos personales */
+.personal-info input[type="text"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.personal-info label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    color: #4a5568;
+    font-weight: bold;
+}
+
+/* Estilos para el paso final de confirmación */
+.confirmation-summary p {
+    text-align: left;
+    color: #4a5568;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.confirmation-summary strong {
+    color: #1a202c;
+}

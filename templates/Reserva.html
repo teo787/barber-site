@@ -1,0 +1,119 @@
+{% extends "Base.html" %}
+{% load static %}
+{% block title %}Reserva| Explicit Barber{% endblock %}
+{% block content %} 
+
+<div class="booking-container">
+
+       <div id="step-1" class="step-content active">
+            <h2>Paso 1: Elige a tu barbero</h2>
+            <div class="barber-list">
+                <div class="barber-card" data-barber-name="Santiago">
+                    <img src="{% static 'Barberia/Imagenes/slider3.jpeg' %}" alt="Imagen 2">
+                    <h3>Santiago</h3>
+                </div>
+                <div class="barber-card" data-barber-name="Pablo">
+                    <img src="{% static 'Barberia/Imagenes/Pablo.jpeg' %}" alt="Imagen 2">
+                    <h3>Pablo</h3>
+               </div>
+                <div class="barber-card" data-barber-name="Pimpon">
+                    <img src="{% static 'Barberia/Imagenes/Pimpon.jpeg' %}" alt="Imagen 2">
+                    <h3>Pimpon</h3>
+                </div>
+                <div class="barber-card" data-barber-name="Daniel">
+                    <img src="{% static 'Barberia/Imagenes/Daniel.jpeg' %}" alt="Imagen 2">
+                    <h3>Daniel</h3>
+                </div>
+            </div>
+            <button class="btn" onclick="nextStep(2)">Siguiente</button>
+         </div>
+
+        <div id="step-2" class="step-content">
+            <h2>Paso 2: Elige fecha y hora</h2>
+            <div class="datetime-picker">
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" name="fecha">
+                <label for="hora">Hora:</label>
+                <select id="hora" name="hora">
+                    <option value="" disabled selected>Selecciona una hora</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="13:00">1:00 PM</option>
+                    <option value="14:00">2:00 PM</option>
+                    <option value="15:00">3:00 PM</option>
+                    <option value="16:00">4:00 PM</option>
+                    <option value="17:00">5:00 PM</option>
+                    <option value="18:00">6:00 PM</option>
+                    <option value="19:00">7:00 PM</option>
+                    <option value="20:00">8:00 PM</option>
+                </select>
+            </div>
+            <button class="btn btn-back" onclick="prevStep(1)">Atrás</button>
+            <button class="btn" onclick="nextStep(3)">Siguiente</button>
+        </div>
+
+        <div id="step-3" class="step-content">
+            <h2>Paso 3: Tus datos</h2>
+            <div class="personal-info">
+                <label for="nombre">Nombre completo:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre">
+                <label for="telefono">Número de teléfono:</label>
+                <input type="text" id="telefono" name="telefono" placeholder="Ingresa tu número">
+            </div>
+            <button class="btn btn-back" onclick="prevStep(2)">Atrás</button>
+            <button class="btn" onclick="nextStep(4)">Confirmar Cita</button>
+        </div>
+
+        <div id="step-4" class="step-content">
+            <h2>¡Cita Confirmada!</h2>
+            <div class="confirmation-summary">
+                <p>Tu cita con <strong id="barber-confirm"></strong> ha sido agendada para el <strong id="date-confirm"></strong> a las <strong id="time-confirm"></strong>.</p>
+                <p>Te contactaremos <strong id="name-confirm"></strong> al número <strong id="phone-confirm"></strong>.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            
+            if (step === 4) {
+                updateConfirmationSummary();
+            }
+
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+        }
+
+        function updateConfirmationSummary() {
+            const selectedBarber = document.querySelector('.barber-card.selected').dataset.barberName;
+            const selectedDate = document.getElementById('fecha').value;
+            const selectedTime = document.getElementById('hora').value;
+            const name = document.getElementById('nombre').value;
+            const phone = document.getElementById('telefono').value;
+
+            document.getElementById('barber-confirm').innerText = selectedBarber;
+            document.getElementById('date-confirm').innerText = selectedDate;
+            document.getElementById('time-confirm').innerText = selectedTime;
+            document.getElementById('name-confirm').innerText = name;
+            document.getElementById('phone-confirm').innerText = phone;
+        }
+
+        document.querySelectorAll('.barber-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.barber-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+
+    </script>
+{% endblock %}
