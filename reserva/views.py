@@ -7,3 +7,5 @@ def  membresia(request):
     return render(request,'Membresia.html')
 def barbers(request):
     return render(request,'Barbers.html')
+def reserva(request):
+    return render(request,'Reserva.html')
