@@ -5,23 +5,18 @@ class Barbero(models.Model):
     nombre=models.CharField(max_length=50)
     imagen=models.ImageField(upload_to="imagenes-barberos")
     email=models.EmailField()
+    calendar_id=models.CharField(max_length=255)
 
     def __str__(self):
         return self.nombre
-
-class Cliente(models.Model):
-    nombre=models.CharField(max_length=50)
-    telefono=models.IntegerField()
-    email=models.EmailField()
-
-    def __str__(self):
-        return self.nombre
-
 
 class Cita(models.Model):
-    cliente=models.ForeignKey(Cliente, on_delete=models.CASCADE)
     barbero=models.ForeignKey(Barbero,on_delete=models.CASCADE)
-    fecha_hora_inicio=models.DateTimeField()
+    fecha=models.DateField()
+    hora=models.TimeField()
+    nombre_cliente=models.CharField(max_length=100)
+    telefono_cliente=models.CharField(max_length=20)
+    fecha_creacion=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.barbero
+        return f"Reserva de {self.nombre_cliente} con {self.barbero.nombre} el {self.fecha} a las {self.hora}"
