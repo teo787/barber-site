@@ -19,7 +19,7 @@ class BarberoSerializer(serializers.ModelSerializer):
         read_only_fields=["id"]
 
 
-CREDENTIALS_FILE = os.path.join(settings.BASE_DIR, 'path/to/your/key.json')
+CREDENTIALS_FILE = os.path.join(settings.BASE_DIR, 'engaged-context-466702-r6-363d54f059d4.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 def get_google_calendar_service():
@@ -32,8 +32,6 @@ def get_google_calendar_service():
     except Exception as e:
         print(f"Error al autenticarse con Google Calendar: {e}")
         return None
-
-
 
 
 class CitaSerializer(serializers.ModelSerializer):
@@ -67,49 +65,49 @@ class CitaSerializer(serializers.ModelSerializer):
         barbero_seleccionado = validated_data['barbero']
         cita = super().create(validated_data)
         
-#        service = get_google_calendar_service()
-#        if service:
-#            try:
-#                barbero_seleccionado = cita.barbero 
+        service = get_google_calendar_service()
+        if service:
+            try:
+                barbero_seleccionado = cita.barbero 
 
-#                start_datetime_str = f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}"
-#                start_datetime_obj = datetime.datetime.fromisoformat(start_datetime_str)
-#                end_datetime_obj = start_datetime_obj + datetime.timedelta(hours=1)
+                start_datetime_str = f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}"
+                start_datetime_obj = datetime.datetime.fromisoformat(start_datetime_str)
+                end_datetime_obj = start_datetime_obj + datetime.timedelta(hours=1)
                 
-#                event = {
-#                    'summary': f'Cita de {cita.nombre_cliente} con {barbero_seleccionado.nombre}',
-#                    'location': 'Explicit Barber Shop',
-#                    'description': f'Cliente: {cita.nombre_cliente}\nTeléfono: {cita.telefono_cliente}',
-#                    'start': {
-#                        'dateTime': start_datetime_obj.isoformat(),
-#                        'timeZone': 'America/Bogota', 
-#                    },
-#                    'end': {
-#                        'dateTime': end_datetime_obj.isoformat(),
-#                        'timeZone': 'America/Bogota', 
-#                    },
-#                }
+                event = {
+                    'summary': f'Cita de {cita.nombre_cliente} con {barbero_seleccionado.nombre}',
+                    'location': 'Explicit Barber Shop',
+                    'description': f'Cliente: {cita.nombre_cliente}\nTeléfono: {cita.telefono_cliente}',
+                    'start': {
+                        'dateTime': start_datetime_obj.isoformat(),
+                        'timeZone': 'America/Bogota', 
+                    },
+                    'end': {
+                        'dateTime': end_datetime_obj.isoformat(),
+                        'timeZone': 'America/Bogota', 
+                    },
+                }
 
-#                created_event = service.events().insert(
-#                    calendarId=barbero_seleccionado.calendar_id, 
-#                    body=event
-#                ).execute()
-#                print(f"Evento de Google Calendar creado: {created_event.get('htmlLink')}")
+                created_event = service.events().insert(
+                    calendarId=barbero_seleccionado.calendar_id, 
+                    body=event
+                ).execute()
+                print(f"Evento de Google Calendar creado: {created_event.get('htmlLink')}")
             
-#            except HttpError as err:
-#                print(f"Error de la API de Google al crear evento: {err}")
-#            except Exception as e:
-#                print(f"Error inesperado al crear el evento de calendario: {e}")
+            except HttpError as err:
+                print(f"Error de la API de Google al crear evento: {err}")
+            except Exception as e:
+                print(f"Error inesperado al crear el evento de calendario: {e}")
 
-#        asunto = 'Nueva reserva recibida'
-#        mensaje = (
-#            f'Hola,\n\n'
-#            f'{cita.nombre_cliente} ha realizado una nueva reserva para el {cita.fecha} a las {cita.hora}\n\n'
-#            f'Revisa los detalles en el panel de administración.\n\n'
-#            f'Saludos,\nTu App'
-#        )
+        asunto = 'Nueva reserva recibida'
+        mensaje = (
+            f'Hola,\n\n'
+            f'{cita.nombre_cliente} ha realizado una nueva reserva para el {cita.fecha} a las {cita.hora}\n\n'
+            f'Revisa los detalles en el panel de administración.\n\n'
+            f'Saludos,\nTu App'
+        )
 
-#      send_mail(
+#        send_mail(
 #            subject=asunto,
 #            message=mensaje,
 #            from_email=settings.EMAIL_HOST_USER,

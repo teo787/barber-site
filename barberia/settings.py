@@ -1,14 +1,15 @@
 from pathlib import Path
 import os
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u1%ur8$c5_5=ik1-0w1=1rle(h26!+s9=gplz$-!fr#3l=_f43'
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -63,11 +64,11 @@ WSGI_APPLICATION = 'barberia.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':'barber',
-        'USER':'postgres',
-        'PASSWORD':"postgres",
-        'HOST':'127.0.0.1',
-        'PORT':'5432',
+        'NAME':config("NAME_DB"),
+        'USER':config("USER_DB"),
+        'PASSWORD':config("PASSWORD_DB"),
+        'HOST':config("HOST_DB"),
+        'PORT':config("POST_DB"),
     }
 }
 
