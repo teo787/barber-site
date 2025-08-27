@@ -1,3 +1,82 @@
 {% extends "Base.html" %}
 {% load static %}
 {% block title %}Membresia| Explicit Barber{% endblock %}
+{% block content %}
+
+
+     <div class="main-video">
+        <video controls>
+           <source src="{% static 'Barberia/Videos/membresia.mp4' %}" type="video/mp4">
+            Tu navegador no soporta el tag de video.
+        </video>
+    </div>
+    <div class="membership-container">
+        <div class="membership-header">
+            <h1>LLEVAMOS TU EXPERIENCIA AL SIGUIENTE NIVEL</h1>
+            <p>¡Con nuestra Membresia lo tienes todo! Descuentos exclusivos y un estilo único solo para ti.</p>
+            <p>¿Qué es la Membresia EXPLICIT?, La Membresia EXPLICIT es una tarjeta pensada en nuestros clientes que buscan siempre lo mejor.</p>
+        </div>
+
+        <div class="membership-benefits">
+            <h2>¿Qué ofrece la Membresia?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/bernalo.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>10% de descuento en la cadena de hoteles BERNALO</h3>
+                    <p>Ideal para tus escapadas y viajes. @hotelsbernalo</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/dental.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>50% de descuento en blanqueamiento dental</h3>
+                    <p>En DENTAL STUDIO, porque una sonrisa impecable siempre suma estilo. @leoodontologo</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/luxury.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>10% de descuento en pintura</h3>
+                    <p>En todos los procesos de embellecimiento de pintura en PAINT LUXURY. @_paintluxury</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/fresquiadero.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>Media botella de ron o aguardiente</h3>
+                    <p>En El FRESQUIADERO para celebrar tu cumpleaños como se merece. @el_fresquiadero</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/dolores.jpeg' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>Bono de $20,000 para tu cumpleaños</h3>
+                    <p>En consumibles, decoración y postre en DOLORES HIDALGO. @doloreshidalgocm</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/store.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>20% de descuento en EXPLICIT STORE</h3>
+                    <p>En toda la tienda el día de tu cumpleaños, para renovar tu estilo con clase.@explicit.store31</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="icon-img">
+                        <img src="{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Imagen principal de la barbería">
+                    </div>
+                    <h3>Precios especiales en barbería</h3>
+                    <p>Además, disfruta de precios especiales en los servicios de barbería en EXPLICIT BARBER SHOP.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="membership-pricing">
+            <h2>¿Cuál es el precio de la Membresia?</h2>
+            <p>La Membresia Explicit tiene un costo único de $60,000 y es valida por todo el año</p>
+            <p class="deadline">Recuerda que la Membresia tiene una venta solo al comienzo del año.</p>
+            <p class="limited-spots">Proxima venta en enero del 2026 ¡Cupos limitados! No dejes pasar la oportunidad.</p>
+        </div>
+    </div>
+{% endblock %}

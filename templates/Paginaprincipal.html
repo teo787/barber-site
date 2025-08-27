@@ -13,15 +13,49 @@
           <img src="{% static 'Barberia/Imagenes/LOGO.png' %}" alt="Explicit Logo" class="logo">  
           <h1 class="welcome-title">BIENVENIDO A EXPLICIT BARBER</h1>
             <p class="welcome-subtitle">MÁS QUE UN CORTE, UNA EXPERIENCIA</p>
-            <a href="/Reserva" class="reserve-button">RESERVA EN LÍNEA</a>
+            <a href="/reserva" class="reserve-button">RESERVA EN LÍNEA</a>
             
           </div>
     </div>
 
-<div class="map-container">
-    <div style="text-align: center; margin: 20px 0;">           
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1667.1366250249293!2d-75.44446713552102!3d6.375731341037127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e443b4f3c71a605%3A0xff1f6f2b77baee18!2sExplicit%20Barber%20Shop!5e0!3m2!1ses-419!2sco!4v1754003570957!5m2!1ses-419!2sco" 
-                    width="600" height="450" style="border:0;"allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
+<section class="why-choose-us">
+  <div class="container">
+    <h2 class="section-title">¿Por que nosotros?</h2>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <img src="{% static 'Barberia/imagenes/tijeras.png' %}" alt="Icono de Barbero">
+        </div>
+        <h3>Barberos Expertos</h3>
+        <p>Nuestros barberos no solo dominan las técnicas de corte, sino que también están en constante formación para ofrecerte los estilos más modernos. Cada uno es un artista, garantizando un resultado impecable en cada visita.
+
+</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <img src="{% static 'Barberia/imagenes/barbera.png' %}" alt="Icono de Navaja">
+        </div>
+        <h3>La Mejor Atención</h3>
+        <p>Desde el momento en que entras, nuestro equipo te hace sentir bienvenido. Escuchamos tus ideas, te asesoramos y nos aseguramos de que cada detalle de tu visita sea perfecto. Tu satisfacción es nuestra prioridad, y eso se nota en cada servicio que brindamos.</p>
+      </div>
+      <div class="feature-item2">
+        <div class="feature-icon2">
+          <img src="{% static 'Barberia/imagenes/Logobarber.png' %}" alt="Icono de Tijeras">
+        </div>
+        <h3>El Mejor Ambiente</h3>
+        <p>Relájate en un espacio diseñado para tu comodidad y disfrute. Con música, un ambiente limpio y una energía positiva, te ofrecemos una pausa de la rutina. Aquí, un corte de pelo no es solo una necesidad, es una experiencia única y placentera.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  
+  <div class="map-container" alt="Ubicacion">
+      <div style="text-align: center; margin: 20px 0;">           
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1667.1366250249293!2d-75.44446713552102!3d6.375731341037127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e443b4f3c71a605%3A0xff1f6f2b77baee18!2sExplicit%20Barber%20Shop!5e0!3m2!1ses-419!2sco!4v1754003570957!5m2!1ses-419!2sco" 
+                      width="600" height="450" style="border:0;"allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                      </div>
+                  </div>
                 </div>
 {% endblock %}

@@ -3,65 +3,55 @@
 {% block title %}Reserva| Explicit Barber{% endblock %}
 {% block content %} 
 
-<div class="booking-container">
-    <div id="step-1" class="step-content active">
-        <h2>Paso 1: Elige a tu barbero</h2>
-        <div class="barber-list">
-            {% for barbero in barbers %}
-            <div class="barber-card" data-barber-name="{{ barbero.nombre }}" data-barber-id={{barbero.id}}>
-                <img src="{{barbero.imagen.url}}" alt="Foto de {{ barbero.nombre }}">
-                <h3>{{ barbero.nombre }}</h3>
+    <div class="booking-container">
+        
+        <div id="step-1" class="step-content active">
+            <h2>Paso 1: Elige a tu barbero</h2>
+            <div class="barber-list">
+                {% for barbero in barbers %}
+                <div class="barber-card" data-barbero-name="{{ barbero.nombre }}" data-barbero-id="{{ barbero.id }}">
+                    <img src="{{barbero.imagen.url}}" alt="Foto de {{ barbero.nombre }}">
+                    <h3>{{ barbero.nombre }}</h3>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            <button class="btn" onclick="nextStep(2)">Siguiente</button>
         </div>
-        <button class="btn" onclick="nextStep(2)">Siguiente</button>
-    </div>
 
-    <div id="step-2" class="step-content">
-        <h2>Paso 2: Elige fecha y hora</h2>
-        <div class="datetime-picker">
-            <label for="fecha">Fecha:</label>
-            <input type="date" id="fecha" name="fecha">
-            <label for="hora">Hora:</label>
-            <select id="hora" name="hora">
-                <option value="" disabled selected>Selecciona una hora</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="13:00">1:00 PM</option>
-                <option value="14:00">2:00 PM</option>
-                <option value="15:00">3:00 PM</option>
-                <option value="16:00">4:00 PM</option>
-                <option value="17:00">5:00 PM</option>
-                <option value="18:00">6:00 PM</option>
-                <option value="19:00">7:00 PM</option>
-                <option value="20:00">8:00 PM</option>
-            </select>
+        <div id="step-2" class="step-content">
+            <h2>Paso 2: Elige fecha y hora</h2>
+            <div class="datetime-picker">
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" name="fecha">
+                <label for="hora">Hora:</label>
+                <select id="hora" name="hora">
+                    <option value="" disabled selected>Selecciona una hora</option>
+                </select>
+            </div>
+            <button class="btn btn-back" onclick="prevStep(1)">Atrás</button>
+            <button class="btn" onclick="nextStep(3)">Siguiente</button>
         </div>
-        <button class="btn btn-back" onclick="prevStep(1)">Atrás</button>
-        <button class="btn" onclick="nextStep(3)">Siguiente</button>
-    </div>
+        
+        <div id="step-3" class="step-content">
+            <h2>Paso 3: Tus datos</h2>
+            <div class="personal-info">
+                <label for="nombre">Nombre completo:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre">
+                <label for="telefono">Número de teléfono:</label>
+                <input type="text" id="telefono" name="telefono" placeholder="Ingresa tu número">
+            </div>
+            <button class="btn btn-back" onclick="prevStep(2)">Atrás</button>
+            <button class="btn" onclick="confirmarCita()">Confirmar Cita</button>
+        </div>
 
-    <div id="step-3" class="step-content">
-        <h2>Paso 3: Tus datos</h2>
-        <div class="personal-info">
-            <label for="nombre">Nombre completo:</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre">
-            <label for="telefono">Número de teléfono:</label>
-            <input type="text" id="telefono" name="telefono" placeholder="Ingresa tu número">
-        </div>
-        <button class="btn btn-back" onclick="prevStep(2)">Atrás</button>
-        <button class="btn" onclick="confirmarCita()">Confirmar Cita</button>
-    </div>
-
-    <div id="step-4" class="step-content">
-        <h2>¡Cita Confirmada!</h2>
-        <div class="confirmation-summary">
-            <p>Tu cita con <strong id="barber-confirm"></strong> ha sido agendada para el <strong id="date-confirm"></strong> a las <strong id="time-confirm"></strong>.</p>
-            <p>Te contactaremos para confirmar a <strong id="name-confirm"></strong> al número <strong id="phone-confirm"></strong>.</p>
+        <div id="step-4" class="step-content">
+            <h2>¡Cita Confirmada!</h2>
+            <div class="confirmation-summary">
+                <p>Tu cita con <strong id="barber-confirm"></strong> ha sido agendada para el <strong id="date-confirm"></strong> a las <strong id="time-confirm"></strong>.</p>
+                <p>Te contactaremos para confirmar a <strong id="name-confirm"></strong> al número <strong id="phone-confirm"></strong>.</p>
+            </div>
         </div>
     </div>
-</div>
 
 <script>
     let currentStep = 1;
@@ -84,7 +74,7 @@
     }
 
     function updateConfirmationSummary() {
-        const selectedBarber = document.querySelector('.barber-card.selected').dataset.barberName;
+        const selectedBarber = document.querySelector('.barber-card.selected').dataset.barberoName;
         const selectedDate = document.getElementById('fecha').value;
         const selectedTime = document.getElementById('hora').value;
         const name = document.getElementById('nombre').value;
@@ -100,7 +90,7 @@
     function confirmarCita() {
         const selectedBarberCard = document.querySelector('.barber-card.selected');
         const selectedBarber = document.querySelector('.barber-card.selected');
-        const selectedBarberId = selectedBarberCard.dataset.barberId; 
+        const selectedBarberId = selectedBarberCard.dataset.barberoId; 
         
         if (!selectedBarber) {
              alert('Por favor, selecciona un barbero.');
@@ -149,7 +139,6 @@
         .catch(error => {
             console.error('Error al guardar la reserva:', error);
             try {
-                // Intenta parsear el mensaje de error para mostrarlo al usuario
                 const errorObj = JSON.parse(error.message);
                 let errorMessage = 'Hubo un problema con tu reserva: ';
                 for (const key in errorObj) {
@@ -183,5 +172,64 @@
         }
         return cookieValue;
     }
+
+        const fechaInput = document.getElementById('fecha');
+        const horaSelect = document.getElementById('hora');
+        
+        // Esta función es la que llama a tu vista de Django para obtener las horas disponibles
+        function actualizarHoras() {
+            const barberoSeleccionado = document.querySelector('.barber-card.selected');
+            const fechaSeleccionada = fechaInput.value;
+
+            // No hacemos nada si no se ha seleccionado un barbero o una fecha
+            if (!barberoSeleccionado || !fechaSeleccionada) {
+                return;
+            }
+
+            const barberoId = barberoSeleccionado.dataset.barberoId;
+            const url = `/reserva/horas_disponibles/${barberoId}/${fechaSeleccionada}/`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener las horas disponibles');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Limpia las opciones existentes y añade el placeholder
+                    horaSelect.innerHTML = '<option value="" disabled selected>Selecciona una hora</option>';
+                    
+                    // Añade las horas disponibles que recibiste del servidor
+                    if (data.horas.length > 0) {
+                        data.horas.forEach(hora => {
+                            const option = document.createElement('option');
+                            option.value = hora;
+                            option.text = hora;
+                            horaSelect.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.text = 'No hay horas disponibles';
+                        option.disabled = true;
+                        horaSelect.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    horaSelect.innerHTML = '<option value="" disabled selected>Error al cargar las horas</option>';
+                });
+        }
+        
+        document.querySelectorAll('.barber-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.barber-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                actualizarHoras(); // Llama a la función
+            });
+        });
+
+        fechaInput.addEventListener('change', actualizarHoras);
 </script>
 {% endblock %}

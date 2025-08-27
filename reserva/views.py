@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Barbero
 
+
 # Create your views here.
 def pagina_principal(request):
     return render(request,'Paginaprincipal.html')

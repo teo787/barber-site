@@ -52,7 +52,11 @@
 .hero-content {
     z-index: 1;
 }
-
+.hero-content2 {
+    width: 30px;
+    text-align: center;
+    display: block
+}
 .welcome-title {
     font-size: 3rem;
     font-weight: bold;
@@ -264,4 +268,247 @@
 
 .confirmation-summary strong {
     color: #1a202c;
+}
+
+
+.why-choose-us {
+  padding: 60px 20px;
+  text-align: center; /* Centra el título y los elementos */
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif; /* Usa una fuente similar a la de la imagen */
+  margin-bottom: 50px;
+  color: #333;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Crea 3 columnas de igual tamaño */
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto; /* Centra el contenedor de las columnas */
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los elementos dentro de cada columna */
+}
+
+.feature-item2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los elementos dentro de cada columna */
+}
+
+.feature-icon img{
+  width: 120px; /* Tamaño del icono */
+  height: 20;
+  margin-bottom: 20px;
+}
+.feature-icon2 img{
+  width: 90px; /* Tamaño del icono */
+  height: 90%;
+  margin-bottom: 20px;
+}
+.feature-item h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+.feature-item2 h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.feature-item p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+.feature-item2 p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr; /* Una sola columna en dispositivos pequeños */
+  }
+}
+
+
+/* Estilos generales para el contenedor de la membresía */
+.membership-container {
+    font-family: 'Gill Sans', sans-serif; /* Usa una fuente moderna y legible */
+    background-color: #fff;
+    color: rgb(2, 13, 20);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.membership-container h1,
+.membership-container h2 {
+    font-family: 'Playfair Display', serif; /* Fuente con serifa para los títulos */
+    color: #222;
+    margin-bottom: 20px;
+}
+
+.membership-container h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.membership-container h2 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.membership-container p {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+/* Sección de Encabezado */
+.membership-header {
+    margin-bottom: 10px;
+    font-family: 'Gill Sans', sans-serif;
+    color: rgb(0, 0, 0);
+    font-weight:rgb(0, 0, 0);
+}
+
+
+/* Sección de Beneficios */
+.membership-benefits {
+    margin-bottom: 10px;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.benefit-item {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.benefit-item:hover {
+    transform: translateY(-5px);
+}
+
+.benefit-item .icon-img {
+    display: flex; /* Para centrar la imagen dentro del contenedor si es necesario */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-bottom: 15px;
+    height: 110px; /* Ajusta la altura del contenedor del icono según necesites */
+}
+
+.benefit-item .icon-img img {
+    width: 200px; /* Ajusta el ancho de la imagen según necesites */
+    height: 150px; /* La altura de la imagen se ajusta al contenedor */
+    display: block; /* Evita espacios extra debajo de la imagen */
+}
+
+
+.benefit-item h3 {
+    font-size: 1.25rem;
+    color: #061e2eff;
+    margin-bottom: 10px;
+}
+
+.benefit-item p {
+    font-size: 0.9rem;
+    color: #061e2eff;
+    margin-bottom: 0;
+}
+
+/* Sección de Precio */
+.membership-pricing {
+    margin-top: 50px;
+    background-color: #061e2eff;
+    color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.membership-pricing h2 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.membership-pricing strong {
+    color: #ff1212; /* Color dorado para el precio */
+}
+
+.membership-pricing .deadline {
+    font-weight: 600;
+    color: #ccc;
+    font-size: 1rem;
+}
+
+.membership-pricing .limited-spots {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #ff0a0a;
+}
+
+/* Media Query para dispositivos pequeños */
+@media (max-width: 768px) {
+    .membership-container h1 {
+        font-size: 2rem;
+    }
+
+    .membership-container h2 {
+        font-size: 1.5rem;
+    }
+}
+
+.main-image {
+    text-align: center; /* Centra el contenido en línea (como la imagen) */
+    padding-top: 25px; /* Espacio por encima de la imagen */
+    padding-bottom: 10px; /* Espacio por debajo de la imagen */
+}
+
+.main-image img {
+    max-width: 300px; /* Asegura que la imagen no exceda el ancho de su contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+    display: block; /* La convierte en un bloque para un mejor control */
+    margin: 0 auto; /* Centra la imagen horizontalmente si es un bloque */
+}
+
+/* Opcional: ajusta los estilos del título si lo deseas */
+.main-image h1 {
+    font-size: 2.5rem;
+    margin-top: 20px;
+}
+
+.main-video {
+    text-align: center; /* Centra el contenedor del video */
+    margin: 30px 0; /* Espacio arriba y abajo */
+}
+
+.main-video video {
+     
+    width: 700px;
+    height: 600px; /* Mantiene la proporción original */
+    border-radius: 15px
 }

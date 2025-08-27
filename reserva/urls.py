@@ -3,10 +3,11 @@ from .views import pagina_principal, membresia,barbers,reserva
 from .api import *
 
 urlpatterns = [
-    path('', pagina_principal),
-    path('Membresia/', membresia),
-    path('Barbers/',barbers),
-    path('Reserva/', reserva),
+    path('', pagina_principal, name="main"),
+    path('membresia/', membresia),
+    path('barbers/',barbers),
+    path('reserva/', reserva),
     path("api/barbero/", BarberoApi.as_view(), name="barbero-api"),
-    path("api/cita/", CitaApi.as_view(), name="cita-api")
+    path("api/cita/", CitaApi.as_view(), name="cita-api"),
+    path("reserva/horas_disponibles/<int:barbero_id>/<str:fecha_str>/", horas_disponibles, name="horas-disponibles")
 ]
