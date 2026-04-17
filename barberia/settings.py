@@ -11,7 +11,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
 # Application definition
@@ -111,9 +111,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'teoursuga@gmail.com'
-EMAIL_HOST_PASSWORD = 'tu_contraseña_o_contraseña_de_aplicación'
+EMAIL_HOST_USER = 'juanjoseca0128@gmail.com'
+EMAIL_HOST_PASSWORD = '1036518848Jj'
+DEFAULT_FROM_EMAIL = 'Explicit Barber <juanjoseca0128@gmail.com>'

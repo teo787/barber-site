@@ -2,37 +2,17 @@ from rest_framework import serializers
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from .models import *
+from .models import Barbero, Cita  # Importación específica para evitar errores
 import datetime
 import os
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-
-
-
+# --- YA NO NECESITAS get_google_calendar_service CON SERVICE ACCOUNT ---
+# Mantenemos BarberoSerializer igual
 class BarberoSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Barbero
-        fields="__all__"
-        read_only_fields=["id"]
-
-
-CREDENTIALS_FILE = os.path.join(settings.BASE_DIR, 'engaged-context-466702-r6-363d54f059d4.json')
-SCOPES = ['https://www.googleapis.com/auth/calendar']
-
-def get_google_calendar_service():
-    try:
-        credentials = service_account.Credentials.from_service_account_file(
-            CREDENTIALS_FILE,
-            scopes=SCOPES
-        )
-        return build('calendar', 'v3', credentials=credentials)
-    except Exception as e:
-        print(f"Error al autenticarse con Google Calendar: {e}")
-        return None
-
+        model = Barbero
+        fields = "__all__"
+        read_only_fields = ["id"]
 
 class CitaSerializer(serializers.ModelSerializer):
     barbero_id = serializers.PrimaryKeyRelatedField(
@@ -51,61 +31,85 @@ class CitaSerializer(serializers.ModelSerializer):
         hora = data.get('hora')
         
         if fecha and hora:
-            fecha_hora_cita = timezone.make_aware(timezone.datetime.combine(fecha, hora))
-        else:
-            raise serializers.ValidationError("La fecha y la hora de la cita son obligatorias.")
-
-        if fecha_hora_cita < timezone.now():
-            raise serializers.ValidationError(
-                {"fecha": "No se puede agendar una cita en el pasado."}
-            )
+            # Combinar fecha y hora para validar que no sea en el pasado
+            fecha_hora_cita = timezone.make_aware(datetime.datetime.combine(fecha, hora))
+            if fecha_hora_cita < timezone.now():
+                raise serializers.ValidationError(
+                    {"fecha": "No se puede agendar una cita en el pasado."}
+                )
         return data
-    
+
     def create(self, validated_data):
-        barbero_seleccionado = validated_data['barbero']
+        # Importación interna para romper el ciclo circular
+        from .api import obtener_servicio_google 
+        
+        # 1. Crear en la Base de Datos local (PostgreSQL)
         cita = super().create(validated_data)
         
-        service = get_google_calendar_service()
+        # 2. Sincronización con Google Calendar via OAuth
+        service = obtener_servicio_google()
         if service:
             try:
-                barbero_seleccionado = cita.barbero 
-
-                start_datetime_str = f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}"
-                start_datetime_obj = datetime.datetime.fromisoformat(start_datetime_str)
-                end_datetime_obj = start_datetime_obj + datetime.timedelta(hours=1)
+                # Calculamos tiempos
+                start_dt = datetime.datetime.combine(cita.fecha, cita.hora)
+                end_dt = start_dt + datetime.timedelta(hours=1)
                 
-                event = {
-                    'summary': f'Cita de {cita.nombre_cliente} con {barbero_seleccionado.nombre}',
+                event_body = {
+                    'summary': f'Cita: {cita.nombre_cliente} - {cita.barbero.nombre}',
                     'location': 'Explicit Barber Shop',
-                    'description': f'Cliente: {cita.nombre_cliente}\nTeléfono: {cita.telefono_cliente}',
+                    'description': f'Teléfono cliente: {cita.telefono_cliente}',
                     'start': {
-                        'dateTime': start_datetime_obj.isoformat(),
+                        'dateTime': start_dt.isoformat(),
                         'timeZone': 'America/Bogota', 
                     },
                     'end': {
-                        'dateTime': end_datetime_obj.isoformat(),
+                        'dateTime': end_dt.isoformat(),
                         'timeZone': 'America/Bogota', 
                     },
+                    'attendees': [], # Vacío para evitar invitaciones extra
                 }
 
+                # Insertamos en el calendario del barbero
                 created_event = service.events().insert(
-                    calendarId=barbero_seleccionado.calendar_id, 
-                    body=event
+                    calendarId=cita.barbero.calendar_id, 
+                    body=event_body,
+                    sendUpdates='none' # Evita notificaciones que duplican eventos
                 ).execute()
-                print(f"Evento de Google Calendar creado: {created_event.get('htmlLink')}")
-            
-            except HttpError as err:
-                print(f"Error de la API de Google al crear evento: {err}")
-            except Exception as e:
-                print(f"Error inesperado al crear el evento de calendario: {e}")
 
-        asunto = 'Nueva reserva recibida'
-        mensaje = (
-            f'Hola,\n\n'
-            f'{cita.nombre_cliente} ha realizado una nueva reserva para el {cita.fecha} a las {cita.hora}\n\n'
-            f'Revisa los detalles en el panel de administración.\n\n'
-            f'Saludos,\nTu App'
-        )
+                # GUARDAMOS EL ID DE GOOGLE (Vital para que el borrado funcione)
+                cita.google_event_id = created_event.get('id')
+                cita.save()
+                
+                print(f"Evento sincronizado en Google con ID: {cita.google_event_id}")
+            
+            except Exception as e:
+                print(f"Error al sincronizar con Google Calendar: {e}")
+
+        # 3. Notificación por Correo (Corregido para evitar el error de la 'ñ' y eventos fantasma)
+        try:
+            # Usamos un lenguaje que Google no interprete como una "invitación"
+            asunto_notificacion = f"Aviso de Gestión: Registro {cita.id}"
+            mensaje_notificacion = (
+                f"Se ha confirmado una nueva entrada en el sistema.\n\n"
+                f"Información técnica:\n"
+                f"- Referencia: {cita.nombre_cliente}\n"
+                f"- Profesional: {cita.barbero.nombre}\n"
+                f"- Día registrado: {cita.fecha}\n"
+                f"- Bloque: {cita.hora}\n\n"
+                f"Verificar detalles en el panel administrativo."
+            )
+
+            send_mail(
+                asunto_notificacion,
+                mensaje_notificacion,
+                settings.DEFAULT_FROM_EMAIL,
+                [cita.barbero.calendar_id], 
+                fail_silently=True, # Si falla el mail por la 'ñ', la cita NO se rompe
+            )
+        except Exception as e:
+            print(f"Error silencioso en envío de correo: {e}")
+
+        return cita
 
 #        send_mail(
 #            subject=asunto,
@@ -115,4 +119,4 @@ class CitaSerializer(serializers.ModelSerializer):
 #            fail_silently=False
 #        )
 
-        return cita
+       
