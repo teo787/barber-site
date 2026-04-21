@@ -95,34 +95,7 @@
     height: auto;
     margin-bottom: 0px; /* Espacio debajo del logo */
 }
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-  gap: 30px; /* Espacio entre las imágenes */
-  justify-items: center; /* Centra cada imagen horizontalmente */
-  align-items: center;
-  padding: 40px;
-}
 
-.image-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.image-box img {
-  width: 500px;
-  height: 500px;
-  object-fit: cover;
-  border-radius: 20px; /* Bordes redondeados */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra opcional */
-}
-
-.title {
-  text-align: center;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
 
 
 
@@ -278,7 +251,7 @@
 
 .section-title {
   font-size: 2.5rem;
-  font-family: 'Playfair Display', serif; /* Usa una fuente similar a la de la imagen */
+  font-family: 'Arial', sans-serif; /* Usa una fuente similar a la de la imagen */
   margin-bottom: 50px;
   color: #333;
 }
@@ -344,143 +317,6 @@
 }
 
 
-/* Estilos generales para el contenedor de la membresía */
-.membership-container {
-    font-family: 'Gill Sans', sans-serif; /* Usa una fuente moderna y legible */
-    background-color: #fff;
-    color: rgb(2, 13, 20);
-    padding: 80px 20px;
-    text-align: center;
-}
-
-.membership-container h1,
-.membership-container h2 {
-    font-family: 'Playfair Display', serif; /* Fuente con serifa para los títulos */
-    color: #222;
-    margin-bottom: 20px;
-}
-
-.membership-container h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-}
-
-.membership-container h2 {
-    font-size: 2rem;
-    font-weight: 600;
-}
-
-.membership-container p {
-    font-size: 1rem;
-    line-height: 1.6;
-    max-width: 800px;
-    margin: 0 auto 30px;
-}
-
-/* Sección de Encabezado */
-.membership-header {
-    margin-bottom: 10px;
-    font-family: 'Gill Sans', sans-serif;
-    color: rgb(0, 0, 0);
-    font-weight:rgb(0, 0, 0);
-}
-
-
-/* Sección de Beneficios */
-.membership-benefits {
-    margin-bottom: 10px;
-}
-
-.benefits-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.benefit-item {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.benefit-item:hover {
-    transform: translateY(-5px);
-}
-
-.benefit-item .icon-img {
-    display: flex; /* Para centrar la imagen dentro del contenedor si es necesario */
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    margin-bottom: 15px;
-    height: 110px; /* Ajusta la altura del contenedor del icono según necesites */
-}
-
-.benefit-item .icon-img img {
-    width: 200px; /* Ajusta el ancho de la imagen según necesites */
-    height: 150px; /* La altura de la imagen se ajusta al contenedor */
-    display: block; /* Evita espacios extra debajo de la imagen */
-}
-
-
-.benefit-item h3 {
-    font-size: 1.25rem;
-    color: #061e2eff;
-    margin-bottom: 10px;
-}
-
-.benefit-item p {
-    font-size: 0.9rem;
-    color: #061e2eff;
-    margin-bottom: 0;
-}
-
-/* Sección de Precio */
-.membership-pricing {
-    margin-top: 50px;
-    background-color: #061e2eff;
-    color: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.membership-pricing h2 {
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-.membership-pricing strong {
-    color: #ff1212; /* Color dorado para el precio */
-}
-
-.membership-pricing .deadline {
-    font-weight: 600;
-    color: #ccc;
-    font-size: 1rem;
-}
-
-.membership-pricing .limited-spots {
-    font-style: italic;
-    font-size: 1.1rem;
-    color: #ff0a0a;
-}
-
-/* Media Query para dispositivos pequeños */
-@media (max-width: 768px) {
-    .membership-container h1 {
-        font-size: 2rem;
-    }
-
-    .membership-container h2 {
-        font-size: 1.5rem;
-    }
-}
 
 .main-image {
     text-align: center; /* Centra el contenido en línea (como la imagen) */
@@ -511,4 +347,211 @@
     width: 700px;
     height: 600px; /* Mantiene la proporción original */
     border-radius: 15px
+}
+
+.precios-servicios {
+        background-color: #f9f9f9; /* Un fondo gris muy claro para diferenciar la sección */
+        padding: 60px 20px;
+        font-family: 'Arial', sans-serif; /* O la tipografía principal de tu web */
+        text-align: center;
+    }
+
+    .titulo-precios {
+        font-size: 2.5rem;
+        margin-bottom: 40px;
+        color: #333;
+        text-transform: uppercase; /* Para un toque más elegante */
+        letter-spacing: 1px;
+    }
+
+    .tabla-precios {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #ddd; /* Borde gris sutil alrededor de la tabla */
+        border-radius: 8px; /* Bordes redondeados */
+        overflow: hidden; /* Asegura que las filas sigan los bordes redondeados */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Sombra suave */
+    }
+
+    .fila-precio {
+        display: flex;
+        justify-content: space-between; /* Servicio a la izquierda, precio a la derecha */
+        padding: 15px 25px;
+        border-bottom: 1px solid #eee; /* Línea divisoria entre filas */
+        transition: background-color 0.3s ease;
+    }
+
+    .fila-precio:last-child {
+        border-bottom: none; /* Elimina la línea en la última fila */
+    }
+
+    .fila-precio:hover {
+        background-color: #f1f1f1; /* Resalta la fila al pasar el mouse */
+    }
+
+    .nombre-servicio {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .costo-servicio {
+        font-size: 1.1rem;
+        color: #000;
+        font-weight: bold;
+    }
+
+    /* Ajuste para dispositivos móviles */
+    @media (max-width: 600px) {
+        .fila-precio {
+            flex-direction: column; /* Apila el nombre y el precio */
+            text-align: center;
+        }
+        .costo-servicio {
+            margin-top: 5px;
+        }
+    }
+
+    /* Contenedor principal de la información superior */
+.contacto-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #051923; 
+    padding: 20px;
+    gap: 10px;
+}
+
+.contacto-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* LA BOLITA ÚNICA (Contenedor) */
+.circulo-logo {
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Evita que el círculo se aplaste en pantallas pequeñas */
+    overflow: hidden;
+}
+
+/* Ajuste de las imágenes dentro del círculo */
+.circulo-logo img {
+    width: 65%; /* Ajusta esto para que el logo no toque los bordes */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ajuste de iconos (como el de calendario) dentro del círculo */
+.circulo-logo i {
+    color: #000;
+    font-size: 1.4rem;
+}
+
+.texto-contacto strong {
+    display: block;
+    color: #fff;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.texto-contacto span {
+    display: block;
+    color: #fff;
+    font-size: 0.75rem;
+}
+
+/* Sección Explicit Barbers */
+.explicit-barbers {
+    background-color: #000;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.titulo-principal {
+    color: #fff;
+    font-size: clamp(1.8rem, 5vw, 3rem); /* Escala automático */
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin-bottom: 40px;
+}
+
+/* GRID RESPONSIVE AUTOMÁTICO */
+.barberos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* TARJETA */
+.barbero-card {
+    position: relative;
+    width: 100%; /* 🔥 clave */
+    aspect-ratio: 3 / 4; /* 🔥 mantiene proporción */
+    border: 2px solid #fff;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+/* IMAGEN */
+.barbero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* OVERLAY */
+.barbero-info {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* HOVER */
+.barbero-card:hover .barbero-info {
+    opacity: 1;
+}
+
+.barbero-card:hover img {
+    transform: scale(1.1);
+}
+
+/* TEXTO */
+.barbero-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #fff;
+    padding-bottom: 5px;
+}
+
+.barbero-info p {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.experiencia {
+    font-weight: bold;
+    font-size: 0.8rem;
+    background: #fff;
+    color: #000;
+    padding: 5px 15px;
+    border-radius: 20px;
 }

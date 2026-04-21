@@ -7,8 +7,7 @@ from reserva.api import webhook_google_calendar
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('reserva.urls')),  
-    path ('Membresia/',include('reserva.urls')),
-    path('Barbers/', include('reserva.urls')),
+    
     path('Reserva/', include('reserva.urls')),
     path('webhook_google_calendar/', webhook_google_calendar, name='webhook_google_calendar'),
 ]

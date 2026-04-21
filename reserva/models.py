@@ -1,14 +1,24 @@
 from django.db import models
 from django.utils import timezone
-
+from datetime import datetime
 class Barbero(models.Model):
     nombre=models.CharField(max_length=50)
     imagen=models.ImageField(upload_to="imagenes-barberos")
     email=models.EmailField()
     calendar_id=models.CharField(max_length=255)
-
+    DIA_DESCANSO_CHOICES = [
+        (0, 'Lunes'),
+        (1, 'Martes'),
+        (2, 'Miércoles'),
+        (3, 'Jueves'),
+        (4, 'Viernes'),
+        (5, 'Sábado'),
+        (6, 'Domingo'),
+    ]
+    dia_descanso = models.IntegerField(choices=DIA_DESCANSO_CHOICES, default=6) # Por defecto Domingo
     def __str__(self):
         return self.nombre
+    
 
 class Cita(models.Model):
     barbero=models.ForeignKey(Barbero,on_delete=models.CASCADE)
@@ -38,3 +48,16 @@ def eliminar_en_google_calendar(sender, instance, **kwargs):
             print(f"Evento {instance.google_event_id} eliminado de Google Calendar")
         except Exception as e:
             print(f"Error al eliminar en Google: {e}")
+            
+
+def es_dia_laboral(fecha_elegida, barbero):
+    """
+    Recibe una fecha (objeto date) y un objeto Barbero.
+    Retorna True si el barbero trabaja, False si es su día de descanso.
+    """
+    # weekday() devuelve 0 para Lunes y 6 para Domingo
+    dia_semana_cita = fecha_elegida.weekday()
+    
+    if dia_semana_cita == barbero.dia_descanso:
+        return False  # Es su día de descanso
+    return True

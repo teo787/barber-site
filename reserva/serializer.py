@@ -2,12 +2,10 @@ from rest_framework import serializers
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from .models import Barbero, Cita  # Importación específica para evitar errores
+from .models import Barbero, Cita
 import datetime
 import os
 
-# --- YA NO NECESITAS get_google_calendar_service CON SERVICE ACCOUNT ---
-# Mantenemos BarberoSerializer igual
 class BarberoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Barbero
@@ -20,7 +18,7 @@ class CitaSerializer(serializers.ModelSerializer):
     )
     barbero = BarberoSerializer(read_only=True)
     fecha_creacion = serializers.DateTimeField(read_only=True)
-
+    
     class Meta:
         model = Cita
         fields = ['id', 'barbero_id', 'barbero', 'fecha', 'hora', 
@@ -29,9 +27,22 @@ class CitaSerializer(serializers.ModelSerializer):
     def validate(self, data):
         fecha = data.get('fecha')
         hora = data.get('hora')
+        barbero = data.get('barbero') # Obtenemos el objeto barbero de los datos de entrada
         
         if fecha and hora:
-            # Combinar fecha y hora para validar que no sea en el pasado
+            # --- NUEVA VALIDACIÓN: DÍA DE DESCANSO DEL BARBERO ---
+            # weekday() en Python: 0=Lunes, 1=Martes... 6=Domingo
+            dia_semana_cita = fecha.weekday()
+            
+            if barbero and dia_semana_cita == barbero.dia_descanso:
+                # Obtenemos el nombre del día para el mensaje de error
+                nombre_dia = barbero.get_dia_descanso_display()
+                raise serializers.ValidationError(
+                    {"fecha": f"El barbero {barbero.nombre} no trabaja los días {nombre_dia}."}
+                )
+            # ------------------------------------------------------
+
+            # Validación de fecha pasada
             fecha_hora_cita = timezone.make_aware(datetime.datetime.combine(fecha, hora))
             if fecha_hora_cita < timezone.now():
                 raise serializers.ValidationError(
@@ -40,7 +51,6 @@ class CitaSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        # Importación interna para romper el ciclo circular
         from .api import obtener_servicio_google 
         
         # 1. Crear en la Base de Datos local (PostgreSQL)
@@ -50,7 +60,6 @@ class CitaSerializer(serializers.ModelSerializer):
         service = obtener_servicio_google()
         if service:
             try:
-                # Calculamos tiempos
                 start_dt = datetime.datetime.combine(cita.fecha, cita.hora)
                 end_dt = start_dt + datetime.timedelta(hours=1)
                 
@@ -66,17 +75,15 @@ class CitaSerializer(serializers.ModelSerializer):
                         'dateTime': end_dt.isoformat(),
                         'timeZone': 'America/Bogota', 
                     },
-                    'attendees': [], # Vacío para evitar invitaciones extra
+                    'attendees': [],
                 }
 
-                # Insertamos en el calendario del barbero
                 created_event = service.events().insert(
                     calendarId=cita.barbero.calendar_id, 
                     body=event_body,
-                    sendUpdates='none' # Evita notificaciones que duplican eventos
+                    sendUpdates='none'
                 ).execute()
 
-                # GUARDAMOS EL ID DE GOOGLE (Vital para que el borrado funcione)
                 cita.google_event_id = created_event.get('id')
                 cita.save()
                 
@@ -85,9 +92,8 @@ class CitaSerializer(serializers.ModelSerializer):
             except Exception as e:
                 print(f"Error al sincronizar con Google Calendar: {e}")
 
-        # 3. Notificación por Correo (Corregido para evitar el error de la 'ñ' y eventos fantasma)
+        # 3. Notificación por Correo
         try:
-            # Usamos un lenguaje que Google no interprete como una "invitación"
             asunto_notificacion = f"Aviso de Gestión: Registro {cita.id}"
             mensaje_notificacion = (
                 f"Se ha confirmado una nueva entrada en el sistema.\n\n"
@@ -104,19 +110,9 @@ class CitaSerializer(serializers.ModelSerializer):
                 mensaje_notificacion,
                 settings.DEFAULT_FROM_EMAIL,
                 [cita.barbero.calendar_id], 
-                fail_silently=True, # Si falla el mail por la 'ñ', la cita NO se rompe
+                fail_silently=True,
             )
         except Exception as e:
             print(f"Error silencioso en envío de correo: {e}")
 
         return cita
-
-#        send_mail(
-#            subject=asunto,
-#            message=mensaje,
-#            from_email=settings.EMAIL_HOST_USER,
-#            recipient_list=[cita.barbero.email],
-#            fail_silently=False
-#        )
-
-       
