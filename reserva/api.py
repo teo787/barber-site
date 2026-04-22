@@ -171,50 +171,48 @@ def webhook_google_calendar(request):
     from .models import Cita, Barbero
     from .api import obtener_servicio_google
 
-    logger.info("--- NOTIFICACIÓN DE CAMBIO DETECTADA EN GOOGLE ---")
+    logger.info("--- NOTIFICACIÓN DE GOOGLE CALENDAR ---")
 
     try:
         service = obtener_servicio_google()
         barberos = Barbero.objects.exclude(calendar_id__isnull=True).exclude(calendar_id="")
         
         for barbero in barberos:
-            # Traemos los eventos actuales de Google para este barbero
+            # 1. Traemos los eventos actuales de Google
             events_result = service.events().list(calendarId=barbero.calendar_id).execute()
             events = events_result.get('items', [])
             
-            # Mapeamos los eventos de Google por ID
+            # Mapeamos por ID para búsqueda rápida
             google_events_dict = {e.get('id'): e for e in events}
             
-            # Filtramos las citas locales que pertenecen a este barbero
+            # 2. Filtramos citas locales de este barbero
             citas_locales = Cita.objects.filter(barbero=barbero).exclude(google_event_id__isnull=True)
 
             for cita in citas_locales:
-                # CASO 1: La cita fue eliminada en Google
+                # CASO A: Borrado (Si ya no está en Google)
                 if cita.google_event_id not in google_events_dict:
-                    logger.info(f"Cita {cita.id} no encontrada en Google. Eliminando de la base de datos...")
+                    logger.info(f"Eliminando cita {cita.id} (Borrada en Google)")
                     cita.delete()
                 
-                # CASO 2: La cita existe, verificar si cambió la fecha/hora
+                # CASO B: Reprogramación (Cambio de hora)
                 else:
                     evento_google = google_events_dict[cita.google_event_id]
                     start_data = evento_google.get('start', {})
-                    # Google usa 'dateTime' para horas específicas y 'date' para todo el día
                     nueva_fecha_str = start_data.get('dateTime') or start_data.get('date')
 
                     if nueva_fecha_str:
-                        # Limpiamos el formato ISO de Google para que Python lo entienda (manejo de 'Z' y offsets)
-                        fecha_limpia = nueva_fecha_str.replace('Z', '+00:00')
-                        nueva_fecha_dt = datetime.fromisoformat(fecha_limpia)
+                        # Convertimos el formato de Google a uno que Django entienda perfectamente
+                        # Reemplazamos 'Z' por '+00:00' para asegurar compatibilidad de zona horaria
+                        fecha_google_dt = datetime.fromisoformat(nueva_fecha_str.replace('Z', '+00:00'))
 
-                        # IMPORTANTE: Solo actualizamos si hay una diferencia real
-                        # Comparamos quitando microsegundos por si acaso
-                        if cita.fecha.replace(microsecond=0) != nueva_fecha_dt.replace(microsecond=0):
-                            logger.info(f"Reprogramación detectada: Cita {cita.id} pasa de {cita.fecha} a {nueva_fecha_dt}")
-                            cita.fecha = nueva_fecha_dt
+                        # Comparamos ignorando los microsegundos para evitar falsos negativos
+                        if cita.fecha.replace(microsecond=0) != fecha_google_dt.replace(microsecond=0):
+                            logger.info(f"Reprogramando cita {cita.id} de {cita.fecha} a {fecha_google_dt}")
+                            cita.fecha = fecha_google_dt
                             cita.save()
 
     except Exception as e:
-        logger.error(f"Error crítico en el webhook: {e}")
+        logger.error(f"Error en webhook: {e}")
         return HttpResponse(status=500)
 
     return HttpResponse(status=200)
