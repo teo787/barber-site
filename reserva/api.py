@@ -163,6 +163,7 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def webhook_google_calendar(request):
+    # Verificamos que sea una notificación real de Google
     resource_state = request.headers.get('X-Goog-Resource-State')
     
     if resource_state == 'sync':
@@ -171,48 +172,55 @@ def webhook_google_calendar(request):
     from .models import Cita, Barbero
     from .api import obtener_servicio_google
 
-    logger.info("--- NOTIFICACIÓN DE GOOGLE CALENDAR ---")
-
     try:
         service = obtener_servicio_google()
+        # Buscamos todos los barberos que tengan un calendario vinculado
         barberos = Barbero.objects.exclude(calendar_id__isnull=True).exclude(calendar_id="")
         
         for barbero in barberos:
-            # 1. Traemos los eventos actuales de Google
+            # Pedimos a Google la lista de eventos actuales de este barbero
             events_result = service.events().list(calendarId=barbero.calendar_id).execute()
             events = events_result.get('items', [])
             
-            # Mapeamos por ID para búsqueda rápida
-            google_events_dict = {e.get('id'): e for e in events}
-            
-            # 2. Filtramos citas locales de este barbero
-            citas_locales = Cita.objects.filter(barbero=barbero).exclude(google_event_id__isnull=True)
-
-            for cita in citas_locales:
-                # CASO A: Borrado (Si ya no está en Google)
-                if cita.google_event_id not in google_events_dict:
-                    logger.info(f"Eliminando cita {cita.id} (Borrada en Google)")
-                    cita.delete()
+            for event in events:
+                google_id = event.get('id')
+                summary = event.get('summary', 'Cita desde Google')
                 
-                # CASO B: Reprogramación (Cambio de hora)
+                # Extraemos la fecha y hora del evento de Google
+                start_data = event.get('start', {})
+                fecha_str = start_data.get('dateTime') or start_data.get('date')
+                
+                if not fecha_str:
+                    continue
+                
+                # Convertimos la fecha a formato Python/Django
+                fecha_dt = datetime.fromisoformat(fecha_str.replace('Z', '+00:00'))
+
+                # --- LÓGICA DE SINCRONIZACIÓN ---
+                cita_existente = Cita.objects.filter(google_event_id=google_id).first()
+
+                if cita_existente:
+                    # Si ya existe, verificamos si cambió la hora (Reprogramación)
+                    if cita_existente.fecha.replace(microsecond=0) != fecha_dt.replace(microsecond=0):
+                        cita_existente.fecha = fecha_dt
+                        cita_existente.save()
+                        logger.info(f"Cita {google_id} actualizada en DB.")
                 else:
-                    evento_google = google_events_dict[cita.google_event_id]
-                    start_data = evento_google.get('start', {})
-                    nueva_fecha_str = start_data.get('dateTime') or start_data.get('date')
-
-                    if nueva_fecha_str:
-                        # Convertimos el formato de Google a uno que Django entienda perfectamente
-                        # Reemplazamos 'Z' por '+00:00' para asegurar compatibilidad de zona horaria
-                        fecha_google_dt = datetime.fromisoformat(nueva_fecha_str.replace('Z', '+00:00'))
-
-                        # Comparamos ignorando los microsegundos para evitar falsos negativos
-                        if cita.fecha.replace(microsecond=0) != fecha_google_dt.replace(microsecond=0):
-                            logger.info(f"Reprogramando cita {cita.id} de {cita.fecha} a {fecha_google_dt}")
-                            cita.fecha = fecha_google_dt
-                            cita.save()
+                    # SI NO EXISTE EN LA BASE DE DATOS, LA CREAMOS
+                    # Solo la creamos si es una fecha futura
+                    if fecha_dt > timezone.now():
+                        Cita.objects.create(
+                            barbero=barbero,
+                            nombre_cliente=summary,
+                            email_cliente="creada-desde-google@barberia.com",
+                            telefono_cliente="N/A",
+                            fecha=fecha_dt,
+                            google_event_id=google_id
+                        )
+                        logger.info(f"Nueva cita {google_id} creada en DB desde Google.")
 
     except Exception as e:
-        logger.error(f"Error en webhook: {e}")
+        logger.error(f"Error en el Webhook: {e}")
         return HttpResponse(status=500)
 
     return HttpResponse(status=200)
