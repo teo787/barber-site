@@ -163,62 +163,58 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def webhook_google_calendar(request):
-    # Google envía notificaciones tipo SYNC o EXISTS en los headers
     resource_state = request.headers.get('X-Goog-Resource-State')
     
-    # Si la señal es 'sync' es solo una confirmación de que el canal se creó.
     if resource_state == 'sync':
         return HttpResponse(status=200)
 
-    from .models import Cita, Barbero  # Importación local
+    from .models import Cita, Barbero
     from .api import obtener_servicio_google
 
-    logger.info("--- RECIBIDA SEÑAL DE CAMBIO DESDE GOOGLE ---")
+    logger.info("--- NOTIFICACIÓN DE CAMBIO DETECTADA EN GOOGLE ---")
 
     try:
         service = obtener_servicio_google()
-        
-        # Revisar los calendarios de TODOS los barberos
         barberos = Barbero.objects.exclude(calendar_id__isnull=True).exclude(calendar_id="")
         
         for barbero in barberos:
-            # 1. Traemos los eventos de este barbero específico
+            # Traemos los eventos actuales de Google para este barbero
             events_result = service.events().list(calendarId=barbero.calendar_id).execute()
             events = events_result.get('items', [])
             
-            # 2. Diccionario de IDs vivos en Google {id: evento_completo}
-            google_events_vivos = {e.get('id'): e for e in events}
+            # Mapeamos los eventos de Google por ID
+            google_events_dict = {e.get('id'): e for e in events}
             
-            # 3. Buscamos citas de ESTE barbero en Django
+            # Filtramos las citas locales que pertenecen a este barbero
             citas_locales = Cita.objects.filter(barbero=barbero).exclude(google_event_id__isnull=True)
 
             for cita in citas_locales:
-                # CASO A: La cita ya no existe en Google -> Eliminar en Django
-                if cita.google_event_id not in google_events_vivos:
-                    logger.info(f"Cita {cita.id} eliminada en Google. Borrando local...")
+                # CASO 1: La cita fue eliminada en Google
+                if cita.google_event_id not in google_events_dict:
+                    logger.info(f"Cita {cita.id} no encontrada en Google. Eliminando de la base de datos...")
                     cita.delete()
                 
-                # CASO B: La cita existe -> Actualizar si cambió la hora
+                # CASO 2: La cita existe, verificar si cambió la fecha/hora
                 else:
-                    evento_google = google_events_vivos[cita.google_event_id]
-                    
-                    # Extraer fecha de Google
+                    evento_google = google_events_dict[cita.google_event_id]
                     start_data = evento_google.get('start', {})
-                    start_str = start_data.get('dateTime', start_data.get('date'))
+                    # Google usa 'dateTime' para horas específicas y 'date' para todo el día
+                    nueva_fecha_str = start_data.get('dateTime') or start_data.get('date')
 
-                    if start_str:
-                        # Convertir el formato de Google (ISO) a un objeto datetime de Python
-                        # Reemplazamos 'Z' por '+00:00' para que sea offset-aware
-                        nueva_fecha = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
+                    if nueva_fecha_str:
+                        # Limpiamos el formato ISO de Google para que Python lo entienda (manejo de 'Z' y offsets)
+                        fecha_limpia = nueva_fecha_str.replace('Z', '+00:00')
+                        nueva_fecha_dt = datetime.fromisoformat(fecha_limpia)
 
-                        # Solo guardamos si la fecha realmente cambió para no saturar la DB
-                        if cita.fecha != nueva_fecha:
-                            logger.info(f"Actualizando cita {cita.id}: Nueva fecha {nueva_fecha}")
-                            cita.fecha = nueva_fecha
+                        # IMPORTANTE: Solo actualizamos si hay una diferencia real
+                        # Comparamos quitando microsegundos por si acaso
+                        if cita.fecha.replace(microsecond=0) != nueva_fecha_dt.replace(microsecond=0):
+                            logger.info(f"Reprogramación detectada: Cita {cita.id} pasa de {cita.fecha} a {nueva_fecha_dt}")
+                            cita.fecha = nueva_fecha_dt
                             cita.save()
 
     except Exception as e:
-        logger.error(f"Error procesando el webhook: {e}")
+        logger.error(f"Error crítico en el webhook: {e}")
         return HttpResponse(status=500)
 
     return HttpResponse(status=200)

@@ -1,11 +1,21 @@
 from django.db import models
 from django.utils import timezone
 from datetime import datetime
+from django.db import models
+
 class Barbero(models.Model):
-    nombre=models.CharField(max_length=50)
-    imagen=models.ImageField(upload_to="imagenes-barberos")
-    email=models.EmailField()
-    calendar_id=models.CharField(max_length=255)
+    nombre = models.CharField(max_length=50)
+    
+    # Cambiamos ImageField por CharField para usar rutas de archivos estáticos.
+    # Esto evita que Render borre las fotos, ya que las leerá de tu carpeta static.
+    imagen = models.CharField(
+        max_length=255, 
+        help_text="Ruta estática. Ej: Barberia/Imagenes/Pimpon.jpeg"
+    )
+    
+    email = models.EmailField()
+    calendar_id = models.CharField(max_length=255)
+    
     DIA_DESCANSO_CHOICES = [
         (0, 'Lunes'),
         (1, 'Martes'),
@@ -15,7 +25,12 @@ class Barbero(models.Model):
         (5, 'Sábado'),
         (6, 'Domingo'),
     ]
-    dia_descanso = models.IntegerField(choices=DIA_DESCANSO_CHOICES, default=6) # Por defecto Domingo
+    
+    dia_descanso = models.IntegerField(
+        choices=DIA_DESCANSO_CHOICES, 
+        default=6
+    )
+
     def __str__(self):
         return self.nombre
     
