@@ -27,7 +27,8 @@ class Cita(models.Model):
     nombre_cliente=models.CharField(max_length=100)
     telefono_cliente=models.CharField(max_length=20)
     fecha_creacion=models.DateTimeField(auto_now_add=True)
-    google_event_id = models.CharField(max_length=255, blank=True, null=True)
+    google_event_id = models.CharField(max_length=255,unique= True, blank=True, null=True)
+    last_sync = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Reserva de {self.nombre_cliente} con {self.barbero.nombre} el {self.fecha} a las {self.hora}"
     

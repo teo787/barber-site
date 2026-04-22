@@ -15,6 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import uuid
 from .models import Cita
+import logging
 # Permisos para leer/escribir en el calendario
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -150,37 +151,57 @@ def suscribir_webhook(url_webhook):
         print(f"Error al suscribir el webhook: {e}")
         return None
 
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 def webhook_google_calendar(request):
-    if request.method == 'POST':
-        from .models import Cita
-        from .api import obtener_servicio_google
+    # Google envía notificaciones tipo SYNC o EXISTS en los headers
+    resource_state = request.headers.get('X-Goog-Resource-State')
+    
+    # Si la señal es 'sync' es solo una confirmación de que el canal se creó.
+    if resource_state == 'sync':
+        return HttpResponse(status=200)
+
+    from .models import Cita, Barbero  # Importación local para evitar bucles
+    from .api import obtener_servicio_google
+
+    logger.info("--- RECIBIDA SEÑAL DE CAMBIO DESDE GOOGLE ---")
+
+    try:
+        service = obtener_servicio_google()
         
-        print("--- RECIBIDA SEÑAL DE CAMBIO DESDE GOOGLE ---")
+        # Debemos revisar los calendarios de TODOS los barberos
+        barberos = Barbero.objects.exclude(calendar_id__isnull=True).exclude(calendar_id="")
         
-        try:
-            service = obtener_servicio_google()
-            # 1. Traemos TODOS los eventos actuales de tu calendario principal
-            events_result = service.events().list(calendarId='primary').execute()
+        for barbero in barberos:
+            # 1. Traemos los eventos de este barbero específico
+            events_result = service.events().list(calendarId=barbero.calendar_id).execute()
             events = events_result.get('items', [])
             
-            # 2. Creamos una lista solo con los IDs que existen en Google ahora mismo
-            google_ids_vivos = [e.get('id') for e in events]
-            print(f"Eventos en Google: {len(google_ids_vivos)}")
-
-            # 3. Buscamos todas las citas en Django que tienen un ID de Google
-            citas_locales = Cita.objects.exclude(google_event_id__isnull=True).exclude(google_event_id="")
+            # 2. Diccionario de IDs vivos en Google para acceso rápido {id: evento_completo}
+            google_events_vivos = {e.get('id'): e for e in events}
             
-            for cita in citas_locales:
-                # 4. LA CLAVE: Si el ID guardado en Django NO ESTÁ en la lista de Google...
-                if cita.google_event_id not in google_ids_vivos:
-                    print(f"¡DETECTADO! La cita {cita.id} no existe en Google. Eliminando de la DB local...")
-                    cita.delete()
-                else:
-                    print(f"La cita {cita.id} sigue presente en Google.")
-                    
-        except Exception as e:
-            print(f"Error procesando el webhook: {e}")
+            # 3. Buscamos citas de ESTE barbero en Django
+            citas_locales = Cita.objects.filter(barbero=barbero).exclude(google_event_id__isnull=True)
 
-        return HttpResponse(status=200)
-    return HttpResponse(status=404)
+            for cita in citas_locales:
+                # CASO A: La cita ya no existe en Google -> Eliminar en Django
+                if cita.google_event_id not in google_events_vivos:
+                    logger.info(f"Cita {cita.id} eliminada en Google. Borrando de DB local...")
+                    cita.delete()
+                
+                # CASO B: La cita existe -> Actualizar si cambió la hora (Sincronización total)
+                else:
+                    evento_google = google_events_vivos[cita.google_event_id]
+                    # Extraer fecha de Google (formato ISO: '2026-04-22T10:00:00Z')
+                    start_str = evento_google['start'].get('dateTime', evento_google['start'].get('date'))
+                    
+                    # Opcional: Aquí podrías comparar start_str con cita.fecha y actualizar
+                    # cita.fecha = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
+                    # cita.save()
+
+    except Exception as e:
+        logger.error(f"Error procesando el webhook: {e}")
+        return HttpResponse(status=500)
+
+    return HttpResponse(status=200)
