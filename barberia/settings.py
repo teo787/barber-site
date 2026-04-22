@@ -64,15 +64,14 @@ WSGI_APPLICATION = 'barberia.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    
-        'default': dj_database_url.config(
-        # Esto lee la variable DATABASE_URL que pegaste en Render
+    'default': dj_database_url.config(
+        # Lee la variable de entorno de Render
         default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
+        conn_max_age=600,
+        # MUY IMPORTANTE: Render requiere SSL para conexiones externas
+        ssl_require=True
     )
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
