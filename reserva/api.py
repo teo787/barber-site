@@ -180,12 +180,10 @@ def horas_disponibles(request, barbero_id, fecha_str):
         return JsonResponse({'error': str(e)}, status=400)
 
 
-# ===============================
-# WEBHOOK GOOGLE CALENDAR
-# ===============================
-
 @csrf_exempt
 def webhook_google_calendar(request):
+
+    print("WEBHOOK GOOGLE DISPARADO")
 
     resource_state = request.headers.get('X-Goog-Resource-State')
 
@@ -204,55 +202,117 @@ def webhook_google_calendar(request):
 
         for barbero in barberos:
 
-            events_result = service.events().list(
-                calendarId=barbero.calendar_id
-            ).execute()
+            try:
 
-            events = events_result.get('items', [])
+                # --------------------------------
+                # USAR SYNCTOKEN SI EXISTE
+                # --------------------------------
 
-            google_ids = []
+                if barbero.sync_token:
 
-            for event in events:
+                    events_result = service.events().list(
 
-                google_id = event.get('id')
-                google_ids.append(google_id)
+                        calendarId=barbero.calendar_id,
 
-                summary = event.get('summary', 'Cita desde Google')
+                        syncToken=barbero.sync_token
 
-                # 🔴 ignorar eventos creados por nuestro sistema
-                props = event.get('extendedProperties', {}).get('private', {})
-
-                if props.get('from_system') == 'barberia_app':
-                    continue
-
-                start_data = event.get('start', {})
-
-                fecha_str = start_data.get('dateTime') or start_data.get('date')
-
-                if not fecha_str:
-                    continue
-
-                fecha_dt = datetime.fromisoformat(
-                    fecha_str.replace('Z', '+00:00')
-                )
-
-                cita_existente = Cita.objects.filter(
-                    google_event_id=google_id
-                ).first()
-
-                if cita_existente:
-
-                    # actualizar si cambió fecha u hora
-                    if cita_existente.fecha != fecha_dt.date() or \
-                       cita_existente.hora != fecha_dt.time():
-
-                        cita_existente.fecha = fecha_dt.date()
-                        cita_existente.hora = fecha_dt.time()
-                        cita_existente.save()
-
-                        logger.info(f"Cita {google_id} actualizada")
+                    ).execute()
 
                 else:
+
+                    # primera sincronización
+                    events_result = service.events().list(
+
+                        calendarId=barbero.calendar_id,
+
+                        singleEvents=True
+
+                    ).execute()
+
+                events = events_result.get('items', [])
+
+                for event in events:
+
+                    google_id = event.get('id')
+
+                    if not google_id:
+                        continue
+
+                    # evento eliminado
+                    if event.get('status') == 'cancelled':
+
+                        Cita.objects.filter(
+                            google_event_id=google_id
+                        ).delete()
+
+                        continue
+
+                    summary = event.get(
+                        'summary',
+                        'Cita desde Google'
+                    )
+
+                    props = event.get(
+                        'extendedProperties',
+                        {}
+                    ).get('private', {})
+
+                    # ignorar eventos creados por nuestra app
+                    if props.get('from_system') == 'barberia_app':
+                        continue
+
+                    start_data = event.get('start', {})
+
+                    fecha_str = start_data.get('dateTime') or start_data.get('date')
+
+                    if not fecha_str:
+                        continue
+
+                    fecha_dt = datetime.fromisoformat(
+                        fecha_str.replace('Z', '+00:00')
+                    )
+
+                    fecha = fecha_dt.date()
+                    hora = fecha_dt.time()
+
+                    cita_existente = Cita.objects.filter(
+                        google_event_id=google_id
+                    ).first()
+
+                    # -------------------------
+                    # ACTUALIZAR
+                    # -------------------------
+
+                    if cita_existente:
+
+                        if cita_existente.fecha != fecha or cita_existente.hora != hora:
+
+                            cita_existente.fecha = fecha
+                            cita_existente.hora = hora
+                            cita_existente.save()
+
+                            logger.info(
+                                f"Cita {google_id} actualizada"
+                            )
+
+                        continue
+
+                    # -------------------------
+                    # PROTEGER DUPLICADOS
+                    # -------------------------
+
+                    duplicada = Cita.objects.filter(
+                        barbero=barbero,
+                        fecha=fecha,
+                        hora=hora
+                    ).exists()
+
+                    if duplicada:
+                        continue
+
+                    # -------------------------
+                    # CREAR CITA
+                    # -------------------------
 
                     if fecha_dt > timezone.now():
 
@@ -264,9 +324,9 @@ def webhook_google_calendar(request):
 
                             telefono_cliente="N/A",
 
-                            fecha=fecha_dt.date(),
+                            fecha=fecha,
 
-                            hora=fecha_dt.time(),
+                            hora=hora,
 
                             google_event_id=google_id
                         )
@@ -275,17 +335,39 @@ def webhook_google_calendar(request):
                             f"Cita {google_id} creada desde Google"
                         )
 
-            # 🔴 ELIMINAR CITAS QUE YA NO EXISTEN EN GOOGLE
+                # --------------------------------
+                # GUARDAR NUEVO SYNCTOKEN
+                # --------------------------------
 
-            Cita.objects.filter(
-                barbero=barbero
-            ).exclude(
-                google_event_id__in=google_ids
-            ).delete()
+                new_sync_token = events_result.get('nextSyncToken')
+
+                if new_sync_token:
+
+                    barbero.sync_token = new_sync_token
+                    barbero.save()
+
+            except Exception as e:
+
+                # token expirado → resetear
+                if "Sync token is no longer valid" in str(e):
+
+                    barbero.sync_token = None
+                    barbero.save()
+
+                    logger.warning(
+                        f"syncToken reiniciado para {barbero.id}"
+                    )
+
+                else:
+
+                    logger.error(
+                        f"Error barbero {barbero.id}: {e}"
+                    )
 
     except Exception as e:
 
         logger.error(f"Error en webhook: {e}")
+
         return HttpResponse(status=500)
 
     return HttpResponse(status=200)

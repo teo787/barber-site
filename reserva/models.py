@@ -12,8 +12,10 @@ class Barbero(models.Model):
     nombre = models.CharField(max_length=50)
     imagen = models.CharField(
         max_length=255, 
-        help_text="Ruta estática. Ej: Barberia/Imagenes/Pimpon.jpeg"
-    )
+        help_text="Ruta estática. Ej: Barberia/Imagenes/Pimpon.jpeg")
+    
+    sync_token = models.TextField(null=True, blank=True)
+    
     email = models.EmailField()
     calendar_id = models.CharField(max_length=255)
     
