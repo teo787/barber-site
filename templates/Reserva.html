@@ -10,7 +10,7 @@
             <div class="barber-list">
                 {% for barbero in barbers %}
                 <div class="barber-card" data-barbero-name="{{ barbero.nombre }}" data-barbero-id="{{ barbero.id }}">
-                    <img src="{{barbero.imagen.url}}" alt="Foto de {{ barbero.nombre }}">
+                    <img src="{% static barbero.imagen %}" alt="{{ barbero.nombre }}">
                     <h3>{{ barbero.nombre }}</h3>
                 </div>
                 {% endfor %}
