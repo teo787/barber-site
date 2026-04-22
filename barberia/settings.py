@@ -11,8 +11,10 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['explicit-barber.onrender.com','localhost', '127.0.0.1', '*']
-
+ALLOWED_HOSTS = ['explicit-barber.onrender.com','localhost', '127.0.0.1']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
 
 # Application definition
 
