@@ -63,20 +63,14 @@ WSGI_APPLICATION = 'barberia.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':config("NAME_DB"),
-        'USER':config("USER_DB"),
-        'PASSWORD':config("PASSWORD_DB"),
-        'HOST':config("HOST_DB"),
-        'PORT':config("PORT_DB"),
+    
         'default': dj_database_url.config(
         # Esto lee la variable DATABASE_URL que pegaste en Render
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600
     )
-    }
 }
+
 
 
 # Password validation
