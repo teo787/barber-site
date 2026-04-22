@@ -4,3 +4,9 @@ pyjwt>=2.8,<3.0
 django-cors-headers>=4.3,<5.0
 djangorestframework-simplejwt
 django-rest-swagger
+gunicorn
+whitenoise
+google-api-python-client
+google-auth-oauthlib
+psycopg2-binary
+dj-database-url

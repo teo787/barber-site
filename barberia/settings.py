@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 from decouple import config
-
+import dj_database_url 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -35,6 +35,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'barberia.urls'
@@ -69,6 +70,11 @@ DATABASES = {
         'PASSWORD':config("PASSWORD_DB"),
         'HOST':config("HOST_DB"),
         'PORT':config("PORT_DB"),
+        'default': dj_database_url.config(
+        # Esto lee la variable DATABASE_URL que pegaste en Render
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600
+    )
     }
 }
 
