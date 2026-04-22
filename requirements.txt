@@ -11,3 +11,4 @@ google-auth-oauthlib
 psycopg2-binary
 dj-database-url
 python-decouple
+Pillow
