@@ -80,7 +80,8 @@ class CitaApi(APIView):
 
 
     def post(self, request):
-
+        print("POST /api/cita ejecutado")
+        print(request.data)
         data = request.data
         serializer = CitaSerializer(data=data)
 
