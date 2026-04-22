@@ -212,9 +212,9 @@ def webhook_google_calendar(request):
                         Cita.objects.create(
                             barbero=barbero,
                             nombre_cliente=summary,
-                            email_cliente="creada-desde-google@barberia.com",
                             telefono_cliente="N/A",
-                            fecha=fecha_dt,
+                            fecha=fecha_dt.date(),
+                            hora=fecha_dt.time(),
                             google_event_id=google_id
                         )
                         logger.info(f"Nueva cita {google_id} creada en DB desde Google.")
