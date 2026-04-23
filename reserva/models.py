@@ -15,7 +15,9 @@ class Barbero(models.Model):
         help_text="Ruta estática. Ej: Barberia/Imagenes/Pimpon.jpeg")
     
     sync_token = models.TextField(null=True, blank=True)
-    
+    watch_channel_id = models.CharField(max_length=255, null=True, blank=True)
+    watch_resource_id = models.CharField(max_length=255, null=True, blank=True)
+    watch_expiration = models.BigIntegerField(null=True, blank=True)
     email = models.EmailField()
     calendar_id = models.CharField(max_length=255)
     
@@ -25,9 +27,7 @@ class Barbero(models.Model):
     ]
     
     dia_descanso = models.IntegerField(choices=DIA_DESCANSO_CHOICES, default=6)
-    watch_channel_id = models.CharField(max_length=255, null=True, blank=True)
-    watch_resource_id = models.CharField(max_length=255, null=True, blank=True)
-    watch_expiration = models.BigIntegerField(null=True, blank=True)
+    
     def __str__(self):
         return self.nombre
 
