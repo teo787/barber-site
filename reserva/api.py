@@ -180,7 +180,7 @@ def horas_disponibles(request, barbero_id, fecha_str):
         return JsonResponse({'error': str(e)}, status=400)
 
 
-@csrf_exempt
+"""@csrf_exempt
 def webhook_google_calendar(request):
 
     print("WEBHOOK GOOGLE DISPARADO")
@@ -362,6 +362,203 @@ def webhook_google_calendar(request):
 
                     logger.error(
                         f"Error barbero {barbero.id}: {e}"
+                    )
+
+    except Exception as e:
+
+        logger.error(f"Error en webhook: {e}")
+
+        return HttpResponse(status=500)
+
+    return HttpResponse(status=200)"""
+    
+@csrf_exempt
+def webhook_google_calendar(request):
+
+    print("WEBHOOK GOOGLE DISPARADO")
+
+    resource_state = request.headers.get('X-Goog-Resource-State')
+
+    # evento de sincronización inicial de Google
+    if resource_state == 'sync':
+        return HttpResponse(status=200)
+
+    try:
+
+        service = obtener_servicio_google()
+
+        barberos = Barbero.objects.exclude(
+            calendar_id__isnull=True
+        ).exclude(
+            calendar_id=""
+        )
+
+        for barbero in barberos:
+
+            try:
+
+                # ------------------------------
+                # USAR SYNCTOKEN
+                # ------------------------------
+
+                if barbero.sync_token:
+
+                    events_result = service.events().list(
+                        calendarId=barbero.calendar_id,
+                        syncToken=barbero.sync_token
+                    ).execute()
+
+                else:
+
+                    # primera sincronización completa
+                    events_result = service.events().list(
+                        calendarId=barbero.calendar_id,
+                        singleEvents=True
+                    ).execute()
+
+                events = events_result.get('items', [])
+
+                for event in events:
+
+                    google_id = event.get('id')
+
+                    if not google_id:
+                        continue
+
+                    # ------------------------------
+                    # EVENTO ELIMINADO EN GOOGLE
+                    # ------------------------------
+
+                    if event.get('status') == 'cancelled':
+
+                        Cita.objects.filter(
+                            google_event_id=google_id
+                        ).delete()
+
+                        continue
+
+                    # ------------------------------
+                    # IGNORAR EVENTOS CREADOS POR LA APP
+                    # ------------------------------
+
+                    props = event.get(
+                        'extendedProperties',
+                        {}
+                    ).get('private', {})
+
+                    if props.get('from_system') == 'barberia_app':
+                        continue
+
+                    summary = event.get(
+                        'summary',
+                        'Cita desde Google'
+                    )
+
+                    start_data = event.get('start', {})
+
+                    fecha_str = start_data.get('dateTime') or start_data.get('date')
+
+                    if not fecha_str:
+                        continue
+
+                    fecha_dt = datetime.fromisoformat(
+                        fecha_str.replace('Z', '+00:00')
+                    )
+
+                    fecha = fecha_dt.date()
+                    hora = fecha_dt.time()
+
+                    # ------------------------------
+                    # BUSCAR CITA POR GOOGLE ID
+                    # ------------------------------
+
+                    cita_existente = Cita.objects.filter(
+                        google_event_id=google_id
+                    ).first()
+
+                    # ------------------------------
+                    # ACTUALIZAR SI YA EXISTE
+                    # ------------------------------
+
+                    if cita_existente:
+
+                        if cita_existente.fecha != fecha or cita_existente.hora != hora:
+
+                            cita_existente.fecha = fecha
+                            cita_existente.hora = hora
+                            cita_existente.save()
+
+                            logger.info(
+                                f"Cita {google_id} actualizada"
+                            )
+
+                        continue
+
+                    # ------------------------------
+                    # PROTECCIÓN EXTRA CONTRA DUPLICADOS
+                    # ------------------------------
+
+                    duplicada = Cita.objects.filter(
+                        barbero=barbero,
+                        fecha=fecha,
+                        hora=hora
+                    ).exists()
+
+                    if duplicada:
+                        continue
+
+                    # ------------------------------
+                    # CREAR CITA
+                    # ------------------------------
+
+                    if fecha_dt > timezone.now():
+
+                        Cita.objects.create(
+
+                            barbero=barbero,
+
+                            nombre_cliente=summary,
+
+                            telefono_cliente="N/A",
+
+                            fecha=fecha,
+
+                            hora=hora,
+
+                            google_event_id=google_id
+                        )
+
+                        logger.info(
+                            f"Cita {google_id} creada desde Google"
+                        )
+
+                # ------------------------------
+                # GUARDAR NUEVO SYNCTOKEN
+                # ------------------------------
+
+                new_sync_token = events_result.get('nextSyncToken')
+
+                if new_sync_token:
+
+                    barbero.sync_token = new_sync_token
+                    barbero.save()
+
+            except Exception as e:
+
+                # syncToken expirado
+                if "Sync token is no longer valid" in str(e):
+
+                    barbero.sync_token = None
+                    barbero.save()
+
+                    logger.warning(
+                        f"syncToken reiniciado para barbero {barbero.id}"
+                    )
+
+                else:
+
+                    logger.error(
+                        f"Error procesando barbero {barbero.id}: {e}"
                     )
 
     except Exception as e:
