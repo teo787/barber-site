@@ -180,7 +180,7 @@ def horas_disponibles(request, barbero_id, fecha_str):
         return JsonResponse({'error': str(e)}, status=400)
 
 
-@csrf_exempt
+"""@csrf_exempt
 def webhook_google_calendar(request):
 
     print("WEBHOOK GOOGLE DISPARADO")
@@ -370,5 +370,111 @@ def webhook_google_calendar(request):
 
         return HttpResponse(status=500)
 
-    return HttpResponse(status=200)
+    return HttpResponse(status=200)"""
     
+@csrf_exempt
+def webhook_google_calendar(request):
+    print("WEBHOOK GOOGLE DISPARADO")
+    resource_state = request.headers.get('X-Goog-Resource-State')
+
+    if resource_state == 'sync':
+        return HttpResponse(status=200)
+
+    from .models import Cita, Barbero
+    from .api import obtener_servicio_google
+
+    try:
+        service = obtener_servicio_google()
+        barberos = Barbero.objects.exclude(calendar_id__isnull=True).exclude(calendar_id="")
+
+        for barbero in barberos:
+            try:
+                # 1. Obtener eventos (usando syncToken si existe)
+                if barbero.sync_token:
+                    events_result = service.events().list(
+                        calendarId=barbero.calendar_id,
+                        syncToken=barbero.sync_token
+                    ).execute()
+                else:
+                    events_result = service.events().list(
+                        calendarId=barbero.calendar_id,
+                        singleEvents=True
+                    ).execute()
+
+                events = events_result.get('items', [])
+
+                for event in events:
+                    google_id = event.get('id')
+                    if not google_id:
+                        continue
+
+                    # 2. Manejo de eliminaciones
+                    if event.get('status') == 'cancelled':
+                        Cita.objects.filter(google_event_id=google_id).delete()
+                        continue
+
+                    # 3. Extraer tiempos
+                    start_data = event.get('start', {})
+                    fecha_str = start_data.get('dateTime') or start_data.get('date')
+                    if not fecha_str:
+                        continue
+
+                    fecha_dt = datetime.fromisoformat(fecha_str.replace('Z', '+00:00'))
+                    fecha_actual = fecha_dt.date()
+                    hora_actual = fecha_dt.time()
+                    summary = event.get('summary', 'Cita desde Google')
+
+                    # 4. BUSCAR SI YA EXISTE EN LA BASE DE DATOS
+                    cita_existente = Cita.objects.filter(google_event_id=google_id).first()
+
+                    if cita_existente:
+                        # SI EXISTE, ACTUALIZAMOS (Aquí es donde fallaba antes)
+                        if cita_existente.fecha != fecha_actual or cita_existente.hora != hora_actual:
+                            cita_existente.fecha = fecha_actual
+                            cita_existente.hora = hora_actual
+                            cita_existente.save()
+                            logger.info(f"Cita {google_id} movida en Google. DB actualizada.")
+                        continue # Pasamos al siguiente evento
+
+                    # 5. SI NO EXISTE, PROTECCIÓN CONTRA DUPLICADOS POR FECHA/HORA
+                    # Esto evita crear una nueva si el Serializer apenas está guardando
+                    duplicada = Cita.objects.filter(
+                        barbero=barbero,
+                        fecha=fecha_actual,
+                        hora=hora_actual
+                    ).exists()
+
+                    if duplicada:
+                        continue
+
+                    # 6. CREAR CITA (Solo si es a futuro)
+                    if fecha_dt > timezone.now():
+                        Cita.objects.create(
+                            barbero=barbero,
+                            nombre_cliente=summary,
+                            telefono_cliente="N/A",
+                            fecha=fecha_actual,
+                            hora=hora_actual,
+                            google_event_id=google_id
+                        )
+                        logger.info(f"Cita {google_id} creada desde Google")
+
+                # 7. GUARDAR NUEVO SYNCTOKEN
+                new_sync_token = events_result.get('nextSyncToken')
+                if new_sync_token:
+                    barbero.sync_token = new_sync_token
+                    barbero.save()
+
+            except Exception as e:
+                if "Sync token is no longer valid" in str(e):
+                    barbero.sync_token = None
+                    barbero.save()
+                    logger.warning(f"syncToken reiniciado para barbero {barbero.id}")
+                else:
+                    logger.error(f"Error procesando eventos de barbero {barbero.id}: {e}")
+
+    except Exception as e:
+        logger.error(f"Error crítico en webhook: {e}")
+        return HttpResponse(status=500)
+
+    return HttpResponse(status=200)
