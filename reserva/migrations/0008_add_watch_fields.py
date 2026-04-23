@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reserva', 'ULTIMA_MIGRACION'),
+        ('reserva', '0007_barbero_sync_token'),
     ]
 
     operations = [
