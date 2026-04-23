@@ -54,7 +54,7 @@ class CitaSerializer(serializers.ModelSerializer):
                 )
         return data
 
-    def create(self, validated_data):
+""" def create(self, validated_data):
         # Importación local para evitar importaciones circulares
         from .api import obtener_servicio_google 
         
@@ -111,15 +111,4 @@ class CitaSerializer(serializers.ModelSerializer):
                     print(f"Error Google Calendar: {e}")
 
         # 4. Notificación por Correo
-        try:
-            send_mail(
-                f"Nueva Cita: {cita.nombre_cliente}",
-                f"Hola {cita.barbero.nombre}, tienes una nueva cita el {cita.fecha} a las {cita.hora}.",
-                settings.DEFAULT_FROM_EMAIL,
-                [cita.barbero.email],
-                fail_silently=True,
-            )
-        except:
-            pass
-
-        return cita
+        return cita"""
