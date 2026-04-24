@@ -24,32 +24,40 @@ from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
-# El scope sigue siendo el mismo
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-
-# Ruta al archivo que descargaste de "Cuentas de servicio"
-SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'service_account.json')
 
 def obtener_servicio_google():
     """
     Autenticación mediante Cuenta de Servicio.
-    No requiere intervención humana ni genera token.json.
     """
     try:
-        if not os.path.exists(SERVICE_ACCOUNT_FILE):
-            logger.error(f"Archivo de credenciales no encontrado en: {SERVICE_ACCOUNT_FILE}")
+        # Intentamos buscar el archivo en la carpeta actual o en la raíz
+        # Asegúrate de que el nombre coincida exactamente con el que subiste
+        posibles_rutas = [
+            os.path.join(os.getcwd(), 'service_account.json'),
+            os.path.join(os.path.dirname(__file__), 'service_account.json'),
+            '/home/render/project/src/service_account.json' # Ruta absoluta en Render
+        ]
+        
+        ruta_final = None
+        for ruta in posibles_rutas:
+            if os.path.exists(ruta):
+                ruta_final = ruta
+                break
+        
+        if not ruta_final:
+            print("❌ ERROR: No se encontró service_account.json en ninguna ruta conocida.")
             return None
 
-        # Usamos service_account en lugar de flow/credentials
         creds = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, 
+            ruta_final, 
             scopes=SCOPES
         )
 
         return build('calendar', 'v3', credentials=creds)
 
     except Exception as e:
-        logger.error(f"Error al obtener el servicio de Google: {e}")
+        print(f"❌ ERROR CRÍTICO al conectar con Google: {e}")
         return None
 
 
