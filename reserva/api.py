@@ -17,42 +17,40 @@ from googleapiclient.discovery import build
 
 from django.views.decorators.csrf import csrf_exempt
 
+import os
+import logging
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+
 logger = logging.getLogger(__name__)
 
+# El scope sigue siendo el mismo
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
-
-# ===============================
-# AUTENTICACIÓN GOOGLE
-# ===============================
+# Ruta al archivo que descargaste de "Cuentas de servicio"
+SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'service_account.json')
 
 def obtener_servicio_google():
-    creds = None
+    """
+    Autenticación mediante Cuenta de Servicio.
+    No requiere intervención humana ni genera token.json.
+    """
+    try:
+        if not os.path.exists(SERVICE_ACCOUNT_FILE):
+            logger.error(f"Archivo de credenciales no encontrado en: {SERVICE_ACCOUNT_FILE}")
+            return None
 
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        # Usamos service_account en lugar de flow/credentials
+        creds = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, 
+            scopes=SCOPES
+        )
 
-    if not creds or not creds.valid:
+        return build('calendar', 'v3', credentials=creds)
 
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json',
-                SCOPES
-            )
-
-            creds = flow.run_local_server(
-                port=8080,
-                access_type='offline',
-                prompt='consent'
-            )
-
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-
-    return build('calendar', 'v3', credentials=creds)
+    except Exception as e:
+        logger.error(f"Error al obtener el servicio de Google: {e}")
+        return None
 
 
 # ===============================
